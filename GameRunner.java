@@ -6,13 +6,13 @@
 
 /*
     Note to future peeps:
-    changes cannot be directly pushed to the git repo from school computers but the files still save
-    So, you can just re-open the files on a pc and commit the changes made by the school computer
+    Changes cannot be directly pushed to the git repo from school computers but the files still save.
+    So, you can just reopen the files on a pc and commit the changes made by the school computer.
 */
 
 public class GameRunner {
     public static void main(String[] args) {
-        // creates the window and starts the game
+        // Creates the window and starts the game
         new Pond();
     }
 }
