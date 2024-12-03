@@ -1,3 +1,9 @@
+/*
+    Finley Meadows & Michael Anderson
+    12/2/2024
+    The Pond class will run all the functions of the game
+*/
+
 import javax.swing.*;
 import java.awt.*;
 
