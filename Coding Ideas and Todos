@@ -1,0 +1,6 @@
+Coding Ideas:
+- Use the glass pane for animations:
+    The glass pane is a transparent component that can be used to block user interaction with
+    the window. This can be helpful when trying to run animations or other background tasks without interruption
+
+TODOs:
