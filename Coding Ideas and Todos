@@ -1,7 +1,116 @@
+Frogs. 
+
+Github: https://github.com/FinleyMeadows/Frog-Civilization-Game.git 
+
+ 
+
+The goal: Get your frog population to 100 froggies 
+
+ 
+
+You start with 4 frogs. 
+
+ 
+
+Tadpoles eat algae and other pond plants. Once they have eaten for a day, they grow into frogs. If they are ever unable to eat, they die. 
+
+Frogs require lily pad space and bugs to eat to survive each day. Frogs can live in burrows. The player can create designated breeding grounds where the frogs can lay their eggs. 
+
+A clock will be displayed and will have a skip to the next day button placed bellow it. The resource in our game will be time. The amount of time you should get each day should be 14 hours because you have to factor in sleepy time. To get bugs or dig burrows or build breeding grounds, the player must spend time to develop them. (Ex: In order to collect 7 bugs, the player spends 30 minutes.) As the clock reaches midnight or 0 (Depending on how we display it), the game will automatically have the tadpoles eat and grow into frogs, have the frogs eat and reproduce, and kill off any tadpoles or frogs that do not have a place to rest or food to eat. 
+
+There should be various items displayed namely: Number of frogs, tadpoles, bugs, plant food, and hours spent in total. The hours spent in total could be a small ranking for the game. The goal could be to get 100 frogs with the least number of hours spent possible. 
+
+Water could require cleaning throughout the game, which if ignored could have a chance to sicken the frogs and kill them. 
+
+Frogs will most likely lay eggs based on an equation, but it could also be affected by designated spots for the frogs to lay their eggs, which could increase the amount of eggs laid. Frogs can just lay their eggs in the sandy floor, so they don’t actually need a designated spot to lay them. But we could have protected places for the frogs to lay their eggs that could increase survival rate or increase the amount of eggs laid. 
+
+ 
+
+ 
+
+Randomizations: 
+
+The collection of bugs/plant food could be a random amount, with the chances of higher amounts of food being collected based on the amount of time spent doing it, and any upgrades the player has bought. 
+
+The number of frog eggs produced each day could be based on the equation: (Frogs / 2) * (a random number between 2 and 5). 
+
+Frog eggs could have a chance of survival, that way frogs can lay a lot of eggs without the number of frogs increasing too fast. The real rate of survival is 2%. The amount of eggs laid at a time is 3000-6000 but those numbers are a little too high. We could potentially have the number of eggs laid by a frog be 500-1000 as long as the egg survival rate is really low. 
+
+Tadpoles growing into frogs could have an 80% chance of happening rather than it being guaranteed with the passing of each day. 
+
+Water cleanliness could give the frogs a percentage of death, as the days pass, which could range from 1–10%, depending on the dirtiness of the water. 
+
+Bugs could have a small chance (like 7%) of leaving the pond area each round, to prevent the mass stocking of bugs and to add another element to the game. 
+
+ 
+
+Upgrades/Tools: 
+
+A water filter could be installed for a high cost of time and could clean the water a certain amount each day. 
+
+Light traps could be bought (time is spent) to collect a certain number of bugs each day. 
+
+Shovels could be acquired to lessen the amount of time it takes to dig homes for the frogs. 
+
+ 
+
+The real question is how does the player acquire these items?? Could the player start with a set value of money with which they can choose what upgrades to buy? Or perhaps you spend an hour of time ‘searching for loot’. 
+
+ 
+
+Actions: 
+
+Collect plant food; ? Hours 
+
+Collect bugs; ? Hours 
+
+Clean the water; ? Hours 
+
+Add a home for frogs; ? Hours 
+
+Search for loot; ? Hours 
+
+Add a lily pad to the pond; ? Hours 
+
+Add a zone for frogs to lay eggs; ? Hours 
+
+ 
+
 Coding Ideas:
 - Use the glass pane for animations:
     The glass pane is a transparent component that can be used to block user interaction with
     the window. This can be helpful when trying to run animations or other background tasks without interruption
 
 TODOs:
-- Create some sort of action menu pop-up when clicking on the sky, water, or ground
+1. Code the Collect Plant Food action
+2. Code the Collect Bug Food action
+4. Code the Create A Frog Home action
+5. Code the Add Lily Pad to Pond action
+6. Create a display for different statistics
+7. Code a way to track time
+8. Create Art
+   - Frogs
+   - Tadpoles
+   - Eggs
+   - Burrow
+   - lily pad
+   - bugs
+   - plant food (algae)
+   - 
+9. Code the day switch mechanism
+   - Calculates frogs survival
+   - Calculates eggs hatching
+   - Calculates tadpoles growing
+   - Calculates the amount of food eaten
+   - Calculates how many bugs flew away
+   -
+EXTRAs:
+1. Code the Add Zone for Frogs to lay eggs action
+2. Add tools and items, as well as the Search for Loot action
+3. Code the Clean the Water action
+   - Create different water arts to show dirtiness
+4. Fancify the statistic displays
+
+
+
+
