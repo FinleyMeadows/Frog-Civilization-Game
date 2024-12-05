@@ -12,14 +12,13 @@ import java.util.Map;
 
 public class Pond extends JFrame {
 
-    // Frame's width
+   
     private final int FRAME_WIDTH = 700;
-    // Frame's height
     private final int FRAME_HEIGHT = 700;
 
     // - - - C O M P O N E N T S - - - //
 
-    // Holds every component in the game
+    // holds every component in the game
     private JLayeredPane layeredPane;
 
     // - - - M A P S - - - //
@@ -29,14 +28,14 @@ public class Pond extends JFrame {
 
     // - - - A R R A Y L I S T S - - - //
 
-    // Stores all the display labels
+    // stores all the display labels
     private ArrayList<JLabel> displayLabels = new ArrayList<JLabel>();
 
-    // Contains all the functions of the game
+    // contains all the functions of the game
     public Pond() {
         // IMPORTANT: this = the JFrame
 
-        // Basic JFrame methods
+        // basic JFrame methods
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         // Sets layout so that the pack() method works
         this.setLayout(new BorderLayout());
@@ -46,17 +45,25 @@ public class Pond extends JFrame {
         layeredPane = new JLayeredPane();
         // The pack() method resizes to preferred sizes not normal sizes
         layeredPane.setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
-        // Adds the layered pane to the center of the JFrame
+        // adds the layered pane to the center of the JFrame
         this.add(layeredPane, BorderLayout.CENTER);
-        // Resizes the JFrame to the size of layeredPane
+        // resizes the JFrame to the size of layeredPane
         this.pack();
+        
+        // adds the background
+        JLabel backgroundImage = new JLabel(new ImageIcon("Pictures/PondBackground.png"));
+        backgroundImage.setSize(700, 700);
+        layeredPane.add(backgroundImage, Integer.valueOf(0));
+        
+        initializeItems();
+        initializeItemDisplayLabels();
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
 
-    // Initializes each item and its quantity
+    // initializes each item and its quantity
     public void initializeItems() {
-        // Number of frogs, tadpoles, bugs, plant food, and hours spent in total
+        // number of frogs, tadpoles, bugs, plant food, and hours spent in total
         items.put("Frogs", 4);
         items.put("Tadpoles", 0);
         items.put("Bugs", 0 /*TBD*/);
@@ -64,33 +71,44 @@ public class Pond extends JFrame {
         items.put("Total Hours Spent", 0);
     }
 
-    // Creates a display label for each item and positions them accordingly in the frame
+    // creates a display label for each item and positions them accordingly in the frame
     public void initializeItemDisplayLabels() {
-        // Creates a display label for each item in the items map<String, Integer>
+        int yPos = 0;
+        
+        // creates a display label for each item in the items map<String, Integer>
         for (Map.Entry<String, Integer> entry : items.entrySet()) {
             String name = entry.getKey();
             int quantity = entry.getValue();
-
+            
+            // customizing the display label
             JLabel displayLabel = new JLabel();
+            displayLabel.setBackground(Color.WHITE);
+            displayLabel.setFont(new Font("Arial", Font.PLAIN, 20));
             displayLabel.setText(name + ": " + quantity);
-            // TODO: Figure out sizing and positioning
-            // displayLabel.setSize();
-            // displayLabel.setLocation();
+            displayLabel.setSize(displayLabel.getPreferredSize());
+            displayLabel.setLocation(0, yPos);
 
-            // Adds the displayLabel to the displayLabels ArrayList for future access
+            // adds the displayLabel to the displayLabels ArrayList for future access
             displayLabels.add(displayLabel);
+            
+            // adds it to the layeredPane
+            layeredPane.add(displayLabel, Integer.valueOf(1));
+            
+            // moves the yPos down below the previous label
+            yPos += displayLabel.getHeight();
         }
     }
 
-    // Updates all display labels whenever necessary
+    // updates all display labels whenever necessary
     public void updateDisplayLabels() {
-        // Updates the text of all the display labels to match their actual quantities in the map
+        // updates the text of all the display labels to match their actual quantities in the map
         for (JLabel displayLabel : displayLabels) {
             String text = displayLabel.getName();
             String itemName = text.substring(0, text.indexOf(":"));
 
-            // Resets the label
+            // resets the label
             displayLabel.setText(itemName + ": " + items.get(itemName));
+            displayLabel.setSize(displayLabel.getPreferredSize());
         }
     }
 }
