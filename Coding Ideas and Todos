@@ -25,7 +25,11 @@ Water could require cleaning throughout the game, which if ignored could have a 
 Frogs will most likely lay eggs based on an equation, but it could also be affected by designated spots for the frogs to lay their eggs, which could increase the amount of eggs laid. Frogs can just lay their eggs in the sandy floor, so they don’t actually need a designated spot to lay them. But we could have protected places for the frogs to lay their eggs that could increase survival rate or increase the amount of eggs laid. 
 
  
-
+When you click on either the Ground, Water, or Sky section of the screen, the actions associated with that section of the area will pop up in a small menu.
+Water: Collect Plant food, Hatchery?, Clean Water?
+Ground: Burrows
+Sky: Collect bugs, Search for loot?
+Water or Sky: Add a lily pad
  
 
 Randomizations: 
@@ -103,7 +107,7 @@ TODOs:
    - Calculates tadpoles growing
    - Calculates the amount of food eaten
    - Calculates how many bugs flew away
-   -
+   - Create a "new day" screen that displays the current day and the all of the resource changes that happened overnight.
 EXTRAs:
 1. Code the Add Zone for Frogs to lay eggs action
 2. Add tools and items, as well as the Search for Loot action
