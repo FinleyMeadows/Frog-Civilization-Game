@@ -12,7 +12,7 @@
 
 public class GameRunner {
     public static void main(String[] args) {
-        // Creates the window and starts the game
+        // creates the window and starts the game
         new Pond();
     }
 }
