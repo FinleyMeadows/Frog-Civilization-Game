@@ -105,7 +105,7 @@ TODOs:
 9. Code the day system
    - Calculates frogs survival
    - Calculates eggs hatching
-   - Calculates tadpoles growing
+   - Calculates tadpoles growing and survival
    - Calculates the amount of food eaten
    - Calculates how many bugs flew away
    - Calculates the number of eggs laid
@@ -121,7 +121,7 @@ EXTRAs:
 
 
 HOW THE DAY SYSTEM WORKS:
-When the day is over, many calculations and updates take place. A frogs survival is based on these factors; a burrow to shelter in, 3 bugs to eat and lily pad access to eat them with, as well as clean water which can save the frogs from getting sick. Each of these has a different weight on survival. Frogs have a base 15% chance of survival. Burrows add a 30% chance of survival, If a lily pad is available - each bug eaten by the frog add a 10% chance of survival, and clean water adds a (25 - 0.25(cleanliness of water(1-100)))% chance of survival.                                                                                                                                                   
+When the day is over, many calculations and updates take place. A frogs survival is based on these factors; a burrow to shelter in, 3 bugs to eat and lily pad access to eat them with, as well as clean water which can save the frogs from getting sick. Each of these has a different weight on survival. Frogs have a base 15% chance of survival. Burrows add a 30% chance of survival, If a lily pad is available - each bug eaten by the frog add a 10% chance of survival, and clean water adds a (25 - 0.25(dirtiness of water(1-100)))% chance of survival. However tadpoles is based off two factors; 2 plant food to eat and clean water. Tadpoles have a base 10% chance of survival. Each plant food eaten adds a 20% chance of survival. And clean water adds a (50 - 0.50(dirtiness of water(1-100)))% chance of survival. If a tadpole survives and has not hatched from an egg during this cycle, it has a 70% chance of growing up into a frog. A frog that has not grown from a tadpole this cycle will hatch 500-1000 eggs. Eggs hatch rates are based on the number of days. 0 days: 0% 1 day: 20% 2 days: 35% 3 days: The eggs die. If the dirtiness of the water surpasses 60% (this number is just a guess) than all eggs in the pond immediately die. Bugs also have a 20% chance to leave the pond area. Once all of these calculations have taken place, a display screen will be shown, giving the player information on all the changes that have been made.
 
 
 
