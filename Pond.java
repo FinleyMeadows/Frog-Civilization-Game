@@ -71,6 +71,16 @@ public class Pond extends JFrame implements MouseListener {
         // resizes the JFrame to the size of layeredPane
         this.pack();
 
+        JLabel tadpole = new JLabel(new ImageIcon("Animations/Tadpole.gif"));
+        tadpole.setSize(tadpole.getPreferredSize());
+        tadpole.setLocation(350, 350);
+        layeredPane.add(tadpole, Integer.valueOf(1));
+
+        JLabel frog = new JLabel(new ImageIcon("Animations/IdleFrog.gif"));
+        frog.setSize(frog.getPreferredSize());
+        frog.setLocation(375, 350);
+        layeredPane.add(frog, Integer.valueOf(1));
+
         // creates each chunk of the background
         createBackground();
         // creates every type of item and sets its value
@@ -79,6 +89,15 @@ public class Pond extends JFrame implements MouseListener {
         initializeItemDisplayLabels();
         // create the time and time functions in the top right of the frame
         initializeTimeComponents();
+
+        for (int i = 0; i < 2; i++) {
+            generateFrogs(100);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
@@ -206,26 +225,51 @@ public class Pond extends JFrame implements MouseListener {
         sky.setName("Sky");
         sky.setSize(sky.getPreferredSize());
         sky.addMouseListener(this);
-        // layeredPane.add(sky, Integer.valueOf(0));
+        layeredPane.add(sky, Integer.valueOf(0));
 
         // adds the WATER to the background
         water.setName("Water");
         water.setSize(water.getPreferredSize());
         water.setLocation(0, sky.getHeight());
         water.addMouseListener(this);
-        // layeredPane.add(water, Integer.valueOf(0));
+        layeredPane.add(water, Integer.valueOf(0));
 
         // adds the GROUND to the background
         ground.setName("Ground");
         ground.setSize(ground.getPreferredSize());
         ground.setLocation(0, water.getY() + water.getHeight());
         ground.addMouseListener(this);
-        // layeredPane.add(ground, Integer.valueOf(0));
+        layeredPane.add(ground, Integer.valueOf(0));
+    }
+    
+    public int generateFrogs(int n) {
+      if (n == 0) {
+         return 0;
+      }
+      else {
+         int xPos = (int) (Math.random() * 680);
+         int yPos = (int) (Math.random() * 445) + 205;
 
-        // TODO: remove this once done with recreating each individual background label
-        JLabel background = new JLabel(new ImageIcon("Pictures/PondBackground.png"));
-        background.setSize(background.getPreferredSize());
-        layeredPane.add(background, Integer.valueOf(0));
+         ImageIcon image;
+          Image rerenderedImage;
+
+          if (yPos > 200 && yPos < 500) {
+              image = new ImageIcon("Animations/SwimmingFrog.gif");
+              rerenderedImage = image.getImage().getScaledInstance(30, 12, Image.SCALE_REPLICATE);
+          }
+          else {
+              image = new ImageIcon("Animations/IdleFrog.gif");
+              rerenderedImage = image.getImage().getScaledInstance(15, 11, Image.SCALE_REPLICATE);
+          }
+
+          JLabel frog = new JLabel(new ImageIcon(rerenderedImage));
+
+         frog.setSize(frog.getPreferredSize());
+         frog.setLocation(xPos, yPos);
+         layeredPane.add(frog, Integer.valueOf(1));
+         
+         return generateFrogs(n - 1);
+      }
     }
 
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
