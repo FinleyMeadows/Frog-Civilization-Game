@@ -16,8 +16,8 @@ import java.util.TreeMap;
 public class Pond extends JFrame implements MouseListener {
 
     // - - - V A R I A B L E S - - - //
-    private final int FRAME_WIDTH = 700;
-    private final int FRAME_HEIGHT = 700;
+    public static final int FRAME_WIDTH = 700;
+    public static final int FRAME_HEIGHT = 700;
 
     // holds the current hour of the day
     private int time = 8;
@@ -46,6 +46,8 @@ public class Pond extends JFrame implements MouseListener {
 
     // holds every type of item and its quantity
     private Map<String, Integer> items = new TreeMap<String, Integer>();
+    // stores all the frogs on the screen and their display labels
+    private Map<JLabel, Frog> frogs = new TreeMap<JLabel, Frog>();
 
     // - - - A R R A Y L I S T S - - - //
 
