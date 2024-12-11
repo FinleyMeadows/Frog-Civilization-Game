@@ -1,6 +1,6 @@
 import javax.swing.Timer;
 
-public class Position extends Frog {
+public class SwimmingPosition extends Frog {
 
     private int xPos;
     private int yPos;
