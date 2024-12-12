@@ -14,6 +14,8 @@ public class Frog {
     private boolean hasBurrow;
     // display label for the egg, tadpole, or frog
     private JLabel displayLabel;
+    // swims the frog/tadpole around when in the water
+    private SwimMovementHandler swimPos = new SwimMovementHandler();
 
     public Frog() {
         // starts as an egg (stage 0)
@@ -21,10 +23,9 @@ public class Frog {
         // hasn't eaten anything yet
         this.algaeEaten = 0;
         this.bugsEaten = 0;
-        // does not start with a home
-        // IDEA frogs get auto-assigned a burrow if you have space
+        // IDEA: frogs get auto-assigned a burrow if you have space
         this.hasBurrow = false;
-        this.displayLabel = new JLabel(new ImageIcon("Animations/IdleFrog.gif"));
+        this.displayLabel = new JLabel();
     }
 
     public boolean isAlive() {
@@ -58,6 +59,18 @@ public class Frog {
 
         // if the random number is within the survival rate it returns true
         return randNum <= survivalRate;
+    }
+
+    public JLabel getDisplayLabel() {
+        return displayLabel;
+    }
+
+    public int getX() {
+        return displayLabel.getX();
+    }
+
+    public int getY() {
+        return displayLabel.getY();
     }
 
 

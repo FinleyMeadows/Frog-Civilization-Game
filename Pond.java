@@ -46,7 +46,7 @@ public class Pond extends JFrame implements MouseListener {
 
     // holds every type of item and its quantity
     private Map<String, Integer> items = new TreeMap<String, Integer>();
-    // stores all the frogs on the screen and their display labels
+    // stores all the frogs and their display labels
     private Map<JLabel, Frog> frogs = new TreeMap<JLabel, Frog>();
 
     // - - - A R R A Y L I S T S - - - //
@@ -91,15 +91,6 @@ public class Pond extends JFrame implements MouseListener {
         initializeItemDisplayLabels();
         // create the time and time functions in the top right of the frame
         initializeTimeComponents();
-
-        for (int i = 0; i < 2; i++) {
-            generateFrogs(100);
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
@@ -243,7 +234,8 @@ public class Pond extends JFrame implements MouseListener {
         ground.addMouseListener(this);
         layeredPane.add(ground, Integer.valueOf(0));
     }
-    
+
+    /*
     public int generateFrogs(int n) {
       if (n == 0) {
          return 0;
@@ -273,6 +265,8 @@ public class Pond extends JFrame implements MouseListener {
          return generateFrogs(n - 1);
       }
     }
+
+    */
 
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
 
