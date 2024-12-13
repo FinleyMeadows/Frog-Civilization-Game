@@ -20,6 +20,8 @@ A clock will be displayed and will have a skip to the next day button placed bel
 
 There should be various items displayed namely: Number of frogs, tadpoles, bugs, plant food, and hours spent in total. The hours spent in total could be a small ranking for the game. The goal could be to get 100 frogs with the least number of hours spent possible. 
 
+A lily pad can hold 6 frogs per time-pass. 20 lily pads should be the max
+
 Water could require cleaning throughout the game, which if ignored could have a chance to sicken the frogs and kill them. 
 
 Frogs will most likely lay eggs based on an equation, but it could also be affected by designated spots for the frogs to lay their eggs, which could increase the amount of eggs laid. Frogs can just lay their eggs in the sandy floor, so they don’t actually need a designated spot to lay them. But we could have protected places for the frogs to lay their eggs that could increase survival rate or increase the amount of eggs laid. 
