@@ -5,13 +5,14 @@
 */
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class Pond extends JFrame implements MouseListener {
 
@@ -47,9 +48,9 @@ public class Pond extends JFrame implements MouseListener {
     // - - - M A P S - - - //
 
     // holds every type of item and its quantity
-    private Map<String, Integer> items = new TreeMap<String, Integer>();
+    private Map<String, Integer> items = new LinkedHashMap<String, Integer>();
     // stores all the frogs and their display labels
-    private Map<JLabel, Frog> frogs = new TreeMap<JLabel, Frog>();
+    private Map<JLabel, Frog> frogs = new HashMap<JLabel, Frog>();
 
     // - - - A R R A Y L I S T S - - - //
 
@@ -75,9 +76,6 @@ public class Pond extends JFrame implements MouseListener {
         // resizes the JFrame to the size of layeredPane
         this.pack();
 
-        // TODO: remove or repurpose this once done with testing
-        spawnFrogs(4);
-
         // creates each chunk of the background
         createBackground();
         // creates every type of item and sets its value
@@ -88,14 +86,18 @@ public class Pond extends JFrame implements MouseListener {
         initializeTimeComponents();
         // starts the bubble animations in the water
         startBackgroundEffects();
+        // spawns the 4 initial frogs
+        spawnFrogs(4);
     }
 
+    // spawns n amount of frogs
     public int spawnFrogs(int n) {
         if (n == 0) {
             return 0;
         }
         else {
             Frog swimmingFrog = new Frog();
+            // immediately grows the frog into stage 3 ("Frog")
             swimmingFrog.growFrog();
             swimmingFrog.growFrog();
             JLabel frogLabel = swimmingFrog.getDisplayLabel();
@@ -109,12 +111,13 @@ public class Pond extends JFrame implements MouseListener {
 
     // initializes each item and its quantity
     public void initializeItems() {
-        // number of frogs, tadpoles, bugs, plant food, and hours spent in total
+        // number of frogs, tadpoles, eggs, bugs, plant food, and hours spent in total
+        items.put("Total Hours Spent", 0);
         items.put("Frogs", 4);
         items.put("Tadpoles", 0);
+        items.put("Eggs", 0);
         items.put("Bugs", 0 /*TBD*/);
         items.put("Plant Food", 0 /*TBD*/);
-        items.put("Total Hours Spent", 0);
     }
 
     // creates a display label for each item and positions them accordingly in the frame
@@ -160,20 +163,39 @@ public class Pond extends JFrame implements MouseListener {
 
     // - - - T I M E  M A N A G E M E N T - - - //
 
+    public void startDay() {
+
+    }
+
 
     public void initializeTimeComponents() {
         int width = 110;
 
-        // formats the time label
-        timeLabel.setFont(new Font("Dialog", Font.PLAIN, 30));
+        // formats the time label:
+        // attempts to use a custom clock font for the time
+        try {
+            File fontFile = new File("Custom Fonts/digital_7/digital-7.ttf");
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+            customFont = customFont.deriveFont(40f); // Set the desired font size
+
+            // use the custom font
+            timeLabel.setFont(customFont);
+
+        }
+        catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
+        // timeLabel.setFont(new Font("Dialog", Font.PLAIN, 30));
         // updates the text in the time label
         updateTime();
+        timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        timeLabel.setIcon(new ImageIcon("Pictures/TimeFrame.png"));
         timeLabel.setSize(width, timeLabel.getPreferredSize().height);
         timeLabel.setLocation(FRAME_WIDTH - width, 0);
         // adds it to the frame
         layeredPane.add(timeLabel, Integer.valueOf(1));
 
-        // formats the bedtime label
+        // formats the bedtime label:
         bedtimeLabel.setFont(new Font("Serif", Font.PLAIN, 15));
         bedtimeLabel.setText("Bedtime: " + bedtime + ":00pm");
         bedtimeLabel.setSize(width, timeLabel.getPreferredSize().height);
@@ -181,7 +203,7 @@ public class Pond extends JFrame implements MouseListener {
         // adds it to the frame
         layeredPane.add(bedtimeLabel, Integer.valueOf(1));
 
-        // formats next day button
+        // formats next day button:
         nextDayLabel.setName("Next Day Label");
         nextDayLabel.setFont(new Font("Serif", Font.PLAIN, 20));
         nextDayLabel.setText("Next Day");

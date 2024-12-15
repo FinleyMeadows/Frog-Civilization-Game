@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.font.ImageGraphicAttribute;
 
 public class SwimMovementHandler {
 
@@ -11,6 +10,7 @@ public class SwimMovementHandler {
     // x 
     private int[] xVelocities = {3, 2, 1};
     private int xVelocityIndex = 0;
+    private final int maxYVelocity;
     private int yVelocity;
     // starts [(+x), (+y)]
     private int[] movementDirections = {1, 1};
@@ -22,7 +22,7 @@ public class SwimMovementHandler {
         this.frog = frog;
         this.xPos = frog.getXPos();
         this.yPos = frog.getYPos();
-        this.yVelocity = (int) (Math.random() * 5) + 1;
+        this.maxYVelocity = (int) (Math.random() * 3) + 1;
 
 
 
@@ -50,9 +50,9 @@ public class SwimMovementHandler {
     // this method must be run after the frog is added to the water
     public void moveFrog() {
         // Frame 1: no change
-        // Frame 2: x change of 3 pixels & y change of 1 pixel
-        // Frame 3: x change of 2 pixels
-        // Frame 4: x change of 1 pixel
+        // Frame 2: x change of xVelocities[0] pixels & y change of 1 pixel
+        // Frame 3: x change of xVelocities[1] pixels & possible y change of 1 pixels
+        // Frame 4: x change of xVelocities[2] pixel & possible y change of 1 pixels
         // Repeat
         
         // this starts after 250 milliseconds which means this starts on the second frame
@@ -68,6 +68,8 @@ public class SwimMovementHandler {
                         switchFrame();
                         // resets the xVelocity
                         xVelocityIndex = 0;
+                        // resets the yVelocity
+                        yVelocity = maxYVelocity;
 
                         break;
 
@@ -75,7 +77,9 @@ public class SwimMovementHandler {
                         switchFrame();
 
                         // y change of 1 pixel:
-                        incrementYVelocity();
+                        yPos += movementDirections[1];
+                        // slows down for next movement
+                        yVelocity--;
                         // checks and deals with border violations
                         checkBorders();
 
@@ -86,6 +90,13 @@ public class SwimMovementHandler {
                         break;
 
                     case 3, 4:
+                        // possible y change of 1 pixel for frames 3 & 4
+                        if (yVelocity > 0) {
+                            yPos += movementDirections[1];
+                            checkBorders();
+                            yVelocity--;
+                        }
+
                         // x change of 2 or 1 pixel(s)
                         incrementXVelocity();
 
@@ -136,13 +147,6 @@ public class SwimMovementHandler {
         }
     }
 
-    private void incrementYVelocity() {
-        for (int i = 0; i < yVelocity; i++) {
-            yPos += movementDirections[1];
-
-            checkBorders();
-        }
-    }
     // divides the total change in x into 1 pixel increments to check for borders each change
     private void incrementXVelocity() {
         for (int i = 0; i < xVelocities[xVelocityIndex]; i++) {

@@ -25,7 +25,6 @@ public class Frog {
         this.bugsEaten = 0;
         // IDEA: frogs get auto-assigned a burrow if you have space
         this.hasBurrow = false;
-        // TODO: randomize this or put in somewhere in a method
         randomizeCoords();
         swimPos = new SwimMovementHandler(this);
     }
