@@ -1,75 +1,214 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.font.ImageGraphicAttribute;
 
-public class SwimMovementHandler extends Frog {
+public class SwimMovementHandler {
 
-    private int xPos = super.getX();
-    private int yPos = super.getY();
-    // 1 / xChange
-    private int xChange;
-    // 'r', 'l'
-    private char[] directions = {'r', 'l'};
-    private char currentDirection;
-    // # of pixels the frog will move
-    private int maxVelocity = 3;
+    private Frog frog;
+    private int xPos;
+    private int yPos;
+    // x 
+    private int[] xVelocities = {4, 2, 1};
+    private int xVelocityIndex = 0;
+    private int yVelocity = 1;
+    // starts [(+x), (+y)]
+    private int[] movementDirections = {1, 1};
     // timer that moves the frog in its direction
     private Timer movementTimer;
+    private int frame = 2;
 
-    public SwimMovementHandler() {
-        // randomizes the xChange [-3, 3]
-        this.xChange = (int) (Math.random() * -7) + 3;
+    public SwimMovementHandler(Frog frog) {
+        this.frog = frog;
+        this.xPos = frog.getXPos();
+        System.out.println(xPos + " = " + frog.getXPos());
+        this.yPos = frog.getYPos();
+        System.out.println(yPos + " = " + frog.getYPos());
 
-        // gets a random direction
-        this.currentDirection = directions[(int) (Math.random() * 2)];
-        // if moving left it inverts the velocity
-        if (currentDirection == 'l') {
-            maxVelocity *= -1;
+        // left facing
+        if ((int) (Math.random() * 2) == 1) {
+            movementDirections[0] *= -1;
+            frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/LeftSwimmingFrog/Frame1.png"));
         }
-    }
+        // right facing
+        else {
+            frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/RightSwimmingFrog/Frame1.png"));
+        }
+        // adjusts the size of the display label
+        frog.getDisplayLabel().setSize(frog.getDisplayLabel().getPreferredSize());
 
-    private int getRandNum(int range, int startingValue) {
-        return (int) (Math.random() * range) + startingValue;
+        // 50-50 up or down
+        if ((int) (Math.random() * 2) == 1) {
+            movementDirections[1] *= -1;
+        }
+
+        // TODO: create 2 different methods: moveFrog() & moveTadpole()
+        System.out.println("Moving frog");
+        moveFrog();
     }
 
     // this method must be run after the frog is added to the water
-    public void move() {
-
+    public void moveFrog() {
+        // Frame 1: no change
+        // Frame 2: x change of 3 pixels & y change of 1 pixel
+        // Frame 3: x change of 2 pixels
+        // Frame 4: x change of 1 pixel
+        // Repeat
+        
+        // this starts after 250 milliseconds which means this starts on the second frame
         movementTimer = new Timer(250, new ActionListener() {
-            int currentVelocity = maxVelocity;
-            int frame = 2;
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // move the max distance on frame 2
-                if (frame == 2) {
-                    xPos += currentVelocity;
+                switch (frame) {
+                    case 1:
+                        // no movement are made on frame 1
 
-                    // out of bounds
-                    if (!inBounds()) {
-                        getBorderContact();
-                    }
-                    // in bounds
+                        // resets the animation
+                        switchFrame();
+                        // resets the xVelocity
+                        xVelocityIndex = 0;
+
+                        break;
+
+                    case 2:
+                        switchFrame();
+
+                        // y change of 1 pixel:
+                        yPos += yVelocity * movementDirections[1];
+                        // checks and deals with border violations
+                        checkBorders();
+
+                        // x change of 3 pixels:
+                        // divides the total change in x into 1 pixel increments to check for borders each change
+                        incrementXVelocity();
+
+                        break;
+
+                    case 3, 4:
+                        // x change of 2 or 1 pixel(s)
+                        incrementXVelocity();
+
+                        break;
+
+                    default:
+                        // this point should never be reached
+                        System.out.println("You messed something up");
+
+                        break;
                 }
 
-                // 3 -> 2 -> 1 -> 0 repeat
-                currentVelocity--;
-                if (currentVelocity == -1) {
-                    currentVelocity = 3;
-                }
-                // cycles between 4 frames
+                // updates the position of the label
+                frog.getDisplayLabel().setLocation(xPos, yPos);
+                
+                // cycle frames 1-4
                 frame++;
                 if (frame == 5) {
                     frame = 1;
                 }
+
+                // print out the current position of the frog
+                System.out.println("Current Position: (" + frog.getXPos() + ", " + frog.getYPos() + ")");
+                System.out.println("Expected Position: (" + xPos + ", " + yPos + ")");
             }
         });
         movementTimer.start();
     }
 
-    // repositions the out-of-bounds JLabel to the edge of the border
-    private void stickToBorder() {
+    public void switchFrame() {
+        // if facing right
+        if (movementDirections[0] == 1) {
+            // frame 1
+            if (frame == 1) {
+                frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/RightSwimmingFrog/Frame1.png"));
+            }
+            // frame > 1
+            else {
+                frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/RightSwimmingFrog/Frame2.png"));
+            }
+        }
+        // if facing left
+        else {
+            // frame 1
+            if (frame == 1) {
+                frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/LeftSwimmingFrog/Frame1.png"));
+            }
+            // frame > 1
+            else {
+                frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/LeftSwimmingFrog/Frame2.png"));
+            }
+        }
+    }
 
+    // divides the total change in x into 1 pixel increments to check for borders each change
+    private void incrementXVelocity() {
+        for (int i = 0; i < xVelocities[xVelocityIndex]; i++) {
+            // changes the xPos by 1 pixel
+            xPos += xVelocities[xVelocityIndex] * movementDirections[0];
+            // check for border violations
+            checkBorders();
+        }
+
+        // slows down for the next set of movements
+        xVelocityIndex += 1;
+    }
+    
+    // checks if the position is out of bounds and corrects the position if needed
+    private void checkBorders() {
+        if (!inBounds()) {
+            char border = getBorderContact();
+
+            switch (border) {
+                case 'n':
+                    // brings label back in bounds
+                    yPos = 204;
+                    // starts moving down
+                    movementDirections[1] *= -1;
+
+                    System.out.println("Flipped yVelocity");
+
+                    break;
+
+                case 'e':
+                    // flips the image left
+                    flipImage();
+                    // brings label back in bounds
+                    xPos = Pond.FRAME_WIDTH - frog.getLabelWidth() - 1;
+                    // starts moving left
+                    movementDirections[0] *= -1;
+
+                    System.out.println("Flipped xVelocity -> " + xVelocities[xVelocityIndex]);
+
+                    break;
+
+                case 's':
+                    // brings label back in bounds
+                    yPos = 510 - frog.getLabelHeight() - 1;
+                    // starts moving up
+                    movementDirections[1] *= -1;
+
+                    System.out.println("Flipped yVelocity");
+
+                    break;
+
+                case 'w':
+                    // flips the image right
+                    flipImage();
+                    // brings label back in bounds
+                    xPos = 1;
+                    // starts moving right
+                    movementDirections[0] *= -1;
+
+                    System.out.println("Flipped xVelocity -> " + xVelocities[xVelocityIndex]);
+
+                    break;
+
+                default:
+                    // do nothing
+
+                    break;
+            }
+        }
     }
 
     // returns the 'n', 'e', 's', or 'w' for the border being hit
@@ -79,15 +218,15 @@ public class SwimMovementHandler extends Frog {
             return 'w';
         }
         // north border (ceiling)
-        else if (yPos < 0) {
+        else if (yPos < 203) {
             return 'n';
         }
         // east border (right wall)
-        else if (xPos + super.getDisplayLabel().getWidth() > Pond.FRAME_WIDTH) {
+        else if (xPos + frog.getLabelWidth() > Pond.FRAME_WIDTH) {
             return 'e';
         }
         // south border (floor)
-        else if (yPos + super.getDisplayLabel().getHeight() > Pond.FRAME_HEIGHT) {
+        else if (yPos + frog.getLabelHeight() > 510) {
             return 's';
         }
         // still in bounds
@@ -104,36 +243,45 @@ public class SwimMovementHandler extends Frog {
         // makes it face left
         if (border == 'e') {
             // if it's a tadpole
-            if (super.getDisplayLabel().getWidth() < 30) {
+            if (frog.getStage().equals("Tadpole")) {
                 // TODO: create an actual flipped image of the tadpole
-                super.getDisplayLabel().setIcon(new ImageIcon("Animations/Tadpole.gif"));
+                frog.getDisplayLabel().setIcon(new ImageIcon("Animations/Tadpole.gif"));
             }
             // if it's a frog
             else {
-                // TODO: create an actual flipped image of the swimming frog
-                super.getDisplayLabel().setIcon(new ImageIcon("Animations/SwimmingFrog.gif"));
+                // frame 1
+                if (frame == 1) {
+                    frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/LeftSwimmingFrog/Frame1.png"));
+                }
+                // frame > 1
+                else {
+                    frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/LeftSwimmingFrog/Frame2.png"));
+                }
             }
         }
         // makes it face right
         if (border == 'w') {
             // if it's a tadpole
-            if (super.getDisplayLabel().getWidth() < 30) {
-                super.getDisplayLabel().setIcon(new ImageIcon("Animations/Tadpole.gif"));
+            if (frog.getStage().equals("Tadpole")) {
+                frog.getDisplayLabel().setIcon(new ImageIcon("Animations/Tadpole.gif"));
             }
             // if it's a frog
             else {
-                super.getDisplayLabel().setIcon(new ImageIcon("Animations/SwimmingFrog.gif"));
+                // frame 1
+                if (frame == 1) {
+                    frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/RightSwimmingFrog/Frame1.png"));
+                }
+                // frame > 1
+                else {
+                    frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/RightSwimmingFrog/Frame2.png"));
+                }
             }
         }
     }
 
     // returns true if the point is in bounds and false if not
     private boolean inBounds() {
-        return xPos >= 0 && yPos >= 0 && xPos + super.getDisplayLabel().getWidth() <= Pond.FRAME_WIDTH &&
-                yPos + super.getDisplayLabel().getHeight() <= Pond.FRAME_HEIGHT;
-    }
-
-    private void bounce() {
-
+        return xPos >= 0 && yPos >= 203 && xPos + frog.getLabelWidth() <= Pond.FRAME_WIDTH &&
+                yPos + frog.getLabelHeight() <= 510;
     }
 }

@@ -26,6 +26,8 @@ public class Pond extends JFrame implements MouseListener {
     private String amOrPm = "am";
     // 1-100, 1 being nasty, 100 being crystal clear
     public static int waterCleanliness = 100;
+    // times all the background effects
+    private Timer backgroundEffectsTimer;
 
     // - - - C O M P O N E N T S - - - //
 
@@ -73,15 +75,12 @@ public class Pond extends JFrame implements MouseListener {
         // resizes the JFrame to the size of layeredPane
         this.pack();
 
-        JLabel tadpole = new JLabel(new ImageIcon("Animations/Tadpole.gif"));
-        tadpole.setSize(tadpole.getPreferredSize());
-        tadpole.setLocation(350, 350);
-        layeredPane.add(tadpole, Integer.valueOf(1));
-
-        JLabel frog = new JLabel(new ImageIcon("Animations/IdleFrog.gif"));
-        frog.setSize(frog.getPreferredSize());
-        frog.setLocation(375, 350);
-        layeredPane.add(frog, Integer.valueOf(1));
+        // TODO: remove this once done with testing
+        Frog swimmingFrog = new Frog();
+        swimmingFrog.growFrog();
+        swimmingFrog.growFrog();
+        JLabel frogLabel = swimmingFrog.getDisplayLabel();
+        layeredPane.add(frogLabel, Integer.valueOf(1));
 
         // creates each chunk of the background
         createBackground();
@@ -91,6 +90,8 @@ public class Pond extends JFrame implements MouseListener {
         initializeItemDisplayLabels();
         // create the time and time functions in the top right of the frame
         initializeTimeComponents();
+        // starts the bubble animations in the water
+        startBackgroundEffects();
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
@@ -119,7 +120,6 @@ public class Pond extends JFrame implements MouseListener {
             displayLabel.setFont(new Font("Serif", Font.PLAIN, 20));
             displayLabel.setText(name + ": " + quantity);
             displayLabel.setSize(displayLabel.getPreferredSize().width + 10, displayLabel.getPreferredSize().height);
-            System.out.println(displayLabel.getPreferredSize());
             displayLabel.setLocation(0, yPos);
 
             // adds the displayLabel to the displayLabels ArrayList for future access
@@ -233,40 +233,71 @@ public class Pond extends JFrame implements MouseListener {
         ground.setLocation(0, water.getY() + water.getHeight());
         ground.addMouseListener(this);
         layeredPane.add(ground, Integer.valueOf(0));
+
+        // adds rocks to the floor of the pond
+        generateRocks();
     }
 
-    /*
-    public int generateFrogs(int n) {
-      if (n == 0) {
-         return 0;
-      }
-      else {
-         int xPos = (int) (Math.random() * 680);
-         int yPos = (int) (Math.random() * 445) + 205;
-
-         ImageIcon image;
-          Image rerenderedImage;
-
-          if (yPos > 200 && yPos < 500) {
-              image = new ImageIcon("Animations/SwimmingFrog.gif");
-              rerenderedImage = image.getImage().getScaledInstance(30, 12, Image.SCALE_REPLICATE);
-          }
-          else {
-              image = new ImageIcon("Animations/IdleFrog.gif");
-              rerenderedImage = image.getImage().getScaledInstance(15, 11, Image.SCALE_REPLICATE);
-          }
-
-          JLabel frog = new JLabel(new ImageIcon(rerenderedImage));
-
-         frog.setSize(frog.getPreferredSize());
-         frog.setLocation(xPos, yPos);
-         layeredPane.add(frog, Integer.valueOf(1));
-         
-         return generateFrogs(n - 1);
-      }
+    private void startBackgroundEffects() {
+        backgroundEffectsTimer = new Timer(1000, e -> {
+            // randomly spawns bubbles
+            int bubbleChance = (int) (Math.random() * 15) + 1;
+            if (bubbleChance == 15) {
+                int bubbleX = (int) (Math.random() * 668);
+                // plays the bubble animations
+                playAnimation(new ImageIcon("Animations/BubbleGif.gif"), bubbleX,
+                        200, 32, 300, 3375);
+            }
+        });
+        backgroundEffectsTimer.start();
     }
 
-    */
+
+    // TODO: delete this method after Michael creates one big rock to cover the pond floor
+    private void generateRocks() {
+        // generates a certain number of rocks on the floor of the pond
+        for (int i = 0; i < 4; i++) {
+            // picks a random rock 0 - 4
+            int rockNum = (int) (Math.random() * 4);
+            JLabel rock = new JLabel(new ImageIcon("Pictures/Rock" + rockNum + ".png"));
+            rock.setSize(rock.getPreferredSize());
+            if (i == 0) {
+                rock.setLocation(0, 360);
+            }
+            else {
+                rock.setLocation((i * 150) + 25, 360);
+            }
+            layeredPane.add(rock, Integer.valueOf(3));
+        }
+    }
+
+    // - - - A N I M A T I O N - - - //
+
+    private void playAnimation(ImageIcon gif, int x, int y, int width, int height, int duration) {
+        // does a weird work-around to reset the gif each time a new one is created
+        Image rerenderedImage = gif.getImage().getScaledInstance(width, height, Image.SCALE_REPLICATE);
+        JLabel animation = new JLabel(new ImageIcon(rerenderedImage));
+
+        animation.setSize(width, height);
+        animation.setLocation(x, y);
+
+        // add the animation to the layeredPane
+        animation.setVisible(true);
+        layeredPane.add(animation, Integer.valueOf(2));
+
+        // creates a timer to control the animation's duration
+        Timer animationTimer = new Timer(duration, e -> {
+            // stop the animation and clean up
+            animation.setVisible(false);
+            layeredPane.remove(animation);
+            layeredPane.revalidate();
+            layeredPane.repaint();
+        });
+
+        // ensure the timer runs only once
+        animationTimer.setRepeats(false);
+        animationTimer.start();
+    }
 
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
 

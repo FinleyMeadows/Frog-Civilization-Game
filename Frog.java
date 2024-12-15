@@ -13,9 +13,9 @@ public class Frog {
     // each frog needs a burrow
     private boolean hasBurrow;
     // display label for the egg, tadpole, or frog
-    private JLabel displayLabel;
+    private JLabel displayLabel = new JLabel();
     // swims the frog/tadpole around when in the water
-    private SwimMovementHandler swimPos = new SwimMovementHandler();
+    private SwimMovementHandler swimPos;
 
     public Frog() {
         // starts as an egg (stage 0)
@@ -25,7 +25,10 @@ public class Frog {
         this.bugsEaten = 0;
         // IDEA: frogs get auto-assigned a burrow if you have space
         this.hasBurrow = false;
-        this.displayLabel = new JLabel();
+        // TODO: randomize this or put in somewhere in a method
+        displayLabel.setLocation(350, 475);
+        swimPos = new SwimMovementHandler(this);
+        System.out.println("Traversed Frog constructor");
     }
 
     public boolean isAlive() {
@@ -61,17 +64,32 @@ public class Frog {
         return randNum <= survivalRate;
     }
 
+    // moves frog to the next stage
+    public void growFrog() {
+        currentStage++;
+    }
+
     public JLabel getDisplayLabel() {
         return displayLabel;
     }
 
-    public int getX() {
+    public int getXPos() {
         return displayLabel.getX();
     }
 
-    public int getY() {
+    public int getYPos() {
         return displayLabel.getY();
     }
 
+    public int getLabelWidth() {
+        return displayLabel.getWidth();
+    }
 
+    public int getLabelHeight() {
+        return displayLabel.getHeight();
+    }
+
+    public String getStage() {
+        return stages[currentStage];
+    }
 }
