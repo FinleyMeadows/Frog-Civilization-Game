@@ -26,9 +26,14 @@ public class Frog {
         // IDEA: frogs get auto-assigned a burrow if you have space
         this.hasBurrow = false;
         // TODO: randomize this or put in somewhere in a method
-        displayLabel.setLocation(350, 475);
+        randomizeCoords();
         swimPos = new SwimMovementHandler(this);
-        System.out.println("Traversed Frog constructor");
+    }
+
+    private void randomizeCoords() {
+        int x = (int) (Math.random() * (Pond.FRAME_WIDTH - displayLabel.getWidth()));
+        int y = (int) (Math.random() * (307 - displayLabel.getHeight())) + 203;
+        displayLabel.setLocation(x, y);
     }
 
     public boolean isAlive() {

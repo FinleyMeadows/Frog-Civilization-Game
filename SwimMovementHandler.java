@@ -9,9 +9,9 @@ public class SwimMovementHandler {
     private int xPos;
     private int yPos;
     // x 
-    private int[] xVelocities = {4, 2, 1};
+    private int[] xVelocities = {3, 2, 1};
     private int xVelocityIndex = 0;
-    private int yVelocity = 1;
+    private int yVelocity;
     // starts [(+x), (+y)]
     private int[] movementDirections = {1, 1};
     // timer that moves the frog in its direction
@@ -21,12 +21,13 @@ public class SwimMovementHandler {
     public SwimMovementHandler(Frog frog) {
         this.frog = frog;
         this.xPos = frog.getXPos();
-        System.out.println(xPos + " = " + frog.getXPos());
         this.yPos = frog.getYPos();
-        System.out.println(yPos + " = " + frog.getYPos());
+        this.yVelocity = (int) (Math.random() * 5) + 1;
+
+
 
         // left facing
-        if ((int) (Math.random() * 2) == 1) {
+        if (((int) (Math.random() * 2)) == 1) {
             movementDirections[0] *= -1;
             frog.getDisplayLabel().setIcon(new ImageIcon("Pictures/LeftSwimmingFrog/Frame1.png"));
         }
@@ -38,12 +39,11 @@ public class SwimMovementHandler {
         frog.getDisplayLabel().setSize(frog.getDisplayLabel().getPreferredSize());
 
         // 50-50 up or down
-        if ((int) (Math.random() * 2) == 1) {
+        if (((int) (Math.random() * 2)) == 1) {
             movementDirections[1] *= -1;
         }
 
         // TODO: create 2 different methods: moveFrog() & moveTadpole()
-        System.out.println("Moving frog");
         moveFrog();
     }
 
@@ -75,7 +75,7 @@ public class SwimMovementHandler {
                         switchFrame();
 
                         // y change of 1 pixel:
-                        yPos += yVelocity * movementDirections[1];
+                        incrementYVelocity();
                         // checks and deals with border violations
                         checkBorders();
 
@@ -106,10 +106,6 @@ public class SwimMovementHandler {
                 if (frame == 5) {
                     frame = 1;
                 }
-
-                // print out the current position of the frog
-                System.out.println("Current Position: (" + frog.getXPos() + ", " + frog.getYPos() + ")");
-                System.out.println("Expected Position: (" + xPos + ", " + yPos + ")");
             }
         });
         movementTimer.start();
@@ -140,6 +136,13 @@ public class SwimMovementHandler {
         }
     }
 
+    private void incrementYVelocity() {
+        for (int i = 0; i < yVelocity; i++) {
+            yPos += movementDirections[1];
+
+            checkBorders();
+        }
+    }
     // divides the total change in x into 1 pixel increments to check for borders each change
     private void incrementXVelocity() {
         for (int i = 0; i < xVelocities[xVelocityIndex]; i++) {
@@ -165,8 +168,6 @@ public class SwimMovementHandler {
                     // starts moving down
                     movementDirections[1] *= -1;
 
-                    System.out.println("Flipped yVelocity");
-
                     break;
 
                 case 'e':
@@ -177,8 +178,6 @@ public class SwimMovementHandler {
                     // starts moving left
                     movementDirections[0] *= -1;
 
-                    System.out.println("Flipped xVelocity -> " + xVelocities[xVelocityIndex]);
-
                     break;
 
                 case 's':
@@ -186,8 +185,6 @@ public class SwimMovementHandler {
                     yPos = 510 - frog.getLabelHeight() - 1;
                     // starts moving up
                     movementDirections[1] *= -1;
-
-                    System.out.println("Flipped yVelocity");
 
                     break;
 
@@ -198,8 +195,6 @@ public class SwimMovementHandler {
                     xPos = 1;
                     // starts moving right
                     movementDirections[0] *= -1;
-
-                    System.out.println("Flipped xVelocity -> " + xVelocities[xVelocityIndex]);
 
                     break;
 

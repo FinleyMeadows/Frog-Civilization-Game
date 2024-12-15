@@ -75,12 +75,8 @@ public class Pond extends JFrame implements MouseListener {
         // resizes the JFrame to the size of layeredPane
         this.pack();
 
-        // TODO: remove this once done with testing
-        Frog swimmingFrog = new Frog();
-        swimmingFrog.growFrog();
-        swimmingFrog.growFrog();
-        JLabel frogLabel = swimmingFrog.getDisplayLabel();
-        layeredPane.add(frogLabel, Integer.valueOf(1));
+        // TODO: remove or repurpose this once done with testing
+        spawnFrogs(4);
 
         // creates each chunk of the background
         createBackground();
@@ -92,6 +88,21 @@ public class Pond extends JFrame implements MouseListener {
         initializeTimeComponents();
         // starts the bubble animations in the water
         startBackgroundEffects();
+    }
+
+    public int spawnFrogs(int n) {
+        if (n == 0) {
+            return 0;
+        }
+        else {
+            Frog swimmingFrog = new Frog();
+            swimmingFrog.growFrog();
+            swimmingFrog.growFrog();
+            JLabel frogLabel = swimmingFrog.getDisplayLabel();
+            layeredPane.add(frogLabel, Integer.valueOf(3));
+
+            return spawnFrogs(n - 1);
+        }
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
@@ -234,8 +245,11 @@ public class Pond extends JFrame implements MouseListener {
         ground.addMouseListener(this);
         layeredPane.add(ground, Integer.valueOf(0));
 
-        // adds rocks to the floor of the pond
-        generateRocks();
+        // adds rocks to the background
+        JLabel rocks = new JLabel(new ImageIcon("Pictures/Rockbed0.png"));
+        rocks.setSize(rocks.getPreferredSize());
+        rocks.setLocation(0, 360);
+        layeredPane.add(rocks, Integer.valueOf(1));
     }
 
     private void startBackgroundEffects() {
@@ -252,25 +266,6 @@ public class Pond extends JFrame implements MouseListener {
         backgroundEffectsTimer.start();
     }
 
-
-    // TODO: delete this method after Michael creates one big rock to cover the pond floor
-    private void generateRocks() {
-        // generates a certain number of rocks on the floor of the pond
-        for (int i = 0; i < 4; i++) {
-            // picks a random rock 0 - 4
-            int rockNum = (int) (Math.random() * 4);
-            JLabel rock = new JLabel(new ImageIcon("Pictures/Rock" + rockNum + ".png"));
-            rock.setSize(rock.getPreferredSize());
-            if (i == 0) {
-                rock.setLocation(0, 360);
-            }
-            else {
-                rock.setLocation((i * 150) + 25, 360);
-            }
-            layeredPane.add(rock, Integer.valueOf(3));
-        }
-    }
-
     // - - - A N I M A T I O N - - - //
 
     private void playAnimation(ImageIcon gif, int x, int y, int width, int height, int duration) {
@@ -283,7 +278,7 @@ public class Pond extends JFrame implements MouseListener {
 
         // add the animation to the layeredPane
         animation.setVisible(true);
-        layeredPane.add(animation, Integer.valueOf(2));
+        layeredPane.add(animation, Integer.valueOf(4));
 
         // creates a timer to control the animation's duration
         Timer animationTimer = new Timer(duration, e -> {
