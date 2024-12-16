@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.Arrays;
 
 public class Frog {
 
@@ -6,6 +7,8 @@ public class Frog {
     private final String[] stages = {"Egg", "Tadpole", "Frog"};
     // holds the current stage of the frog
     private int currentStage;
+    // the name of the frog
+    private String name = getRandomName();
     // each tadpole needs 3 pieces of algae each day
     private int algaeEaten;
     // each frog needs 3 bugs per day
@@ -25,8 +28,23 @@ public class Frog {
         this.bugsEaten = 0;
         // IDEA: frogs get auto-assigned a burrow if you have space
         this.hasBurrow = false;
+        displayLabel.setName("Frog Label");
         randomizeCoords();
         swimPos = new SwimMovementHandler(this);
+    }
+
+    private String getRandomName() {
+        String[] names = {"Lily", "Clover", "Fern", "Pebble", "Willow",
+                "Mossy", "Dewdrop", "Puddle", "Meadow", "Rainy",
+                "Pickle", "Jellybean", "Tater Tot", "Muffin", "Cupcake",
+                "Sprout", "Lemon", "Olive", "Pistachio", "Gingersnap",
+                "Hoppy", "Bouncer", "Ribbit", "Wiggles", "Toadette",
+                "Leapster", "Zippy", "Quibbles", "Splashy", "Flip-Flop",
+                "Frodo", "Glimmer", "Toadsworth", "Finley", "Froglina",
+                "Mikey", "Skippy", "Doodle", "Liam", "Luca", "Michael"
+        };
+
+        return names[(int) (Math.random() * names.length)];
     }
 
     private void randomizeCoords() {
@@ -95,5 +113,9 @@ public class Frog {
 
     public String getStage() {
         return stages[currentStage];
+    }
+
+    public String getName() {
+        return name;
     }
 }

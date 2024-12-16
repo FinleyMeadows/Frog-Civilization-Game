@@ -32,6 +32,9 @@ public class Pond extends JFrame implements MouseListener {
 
     // - - - C O M P O N E N T S - - - //
 
+    // holds every component in the game
+    private JLayeredPane layeredPane;
+
     // background labels
     private JLabel sky = new JLabel(new ImageIcon("Pictures/Sky.png"));
     private JLabel water = new JLabel(new ImageIcon("Pictures/Water.png"));
@@ -42,8 +45,10 @@ public class Pond extends JFrame implements MouseListener {
     private JLabel bedtimeLabel = new JLabel();
     private JLabel nextDayLabel = new JLabel();
 
-    // holds every component in the game
-    private JLayeredPane layeredPane;
+    // label that displays the frogs name above its image
+    private JLabel frogNameLabel;
+    // keeps the position of the frog's name synced with the position of the frog's label
+    private Timer nameUpdater;
 
     // - - - M A P S - - - //
 
@@ -88,7 +93,11 @@ public class Pond extends JFrame implements MouseListener {
         startBackgroundEffects();
         // spawns the 4 initial frogs
         spawnFrogs(4);
+        // TODO: remove this once done testing
+        addLilyPads();
     }
+
+    // - - - I D K - - - //
 
     // spawns n amount of frogs
     public int spawnFrogs(int n) {
@@ -97,10 +106,14 @@ public class Pond extends JFrame implements MouseListener {
         }
         else {
             Frog swimmingFrog = new Frog();
-            // immediately grows the frog into stage 3 ("Frog")
+            // immediately grows the frog into stage 3: "Frog"
             swimmingFrog.growFrog();
             swimmingFrog.growFrog();
             JLabel frogLabel = swimmingFrog.getDisplayLabel();
+            frogLabel.addMouseListener(this);
+            frogs.put(frogLabel, swimmingFrog);
+
+            // adds it to the screen
             layeredPane.add(frogLabel, Integer.valueOf(3));
 
             return spawnFrogs(n - 1);
@@ -288,6 +301,28 @@ public class Pond extends JFrame implements MouseListener {
         backgroundEffectsTimer.start();
     }
 
+    // TEMP method
+    public void addLilyPads() {
+        int randPad;
+
+        for (int i = 0; i < 20; i++) {
+            randPad = (int) (Math.random() * 2);
+
+            JLabel lilyPad = new JLabel();
+
+            if (randPad == 1) {
+                lilyPad.setIcon(new ImageIcon("Pictures/LilyPadWithLotus.png"));
+            }
+            else {
+                lilyPad.setIcon(new ImageIcon("Pictures/LilyPad.png"));
+            }
+
+            lilyPad.setSize(lilyPad.getPreferredSize());
+            lilyPad.setLocation(i * 30 + i * 7, 203 - lilyPad.getHeight() + 1);
+            layeredPane.add(lilyPad, Integer.valueOf(2));
+        }
+    }
+
     // - - - A N I M A T I O N - - - //
 
     private void playAnimation(ImageIcon gif, int x, int y, int width, int height, int duration) {
@@ -357,11 +392,37 @@ public class Pond extends JFrame implements MouseListener {
         Object object = e.getSource();
 
         // if the object is a JLabel
-        if (object instanceof JLabel temp) {
+        if (object instanceof JLabel label) {
             // if the JLabel being entered has a name
             // (all JLabels with mouseListeners added should be named)
-            if (temp.getName() != null) {
-                temp.setBorder(new LineBorder(Color.YELLOW, 1));
+            if (label.getName() != null) {
+                String name = label.getName();
+
+                // if it's a background label it highlights the border
+                if (name.equals("Sky") || name.equals("Water") || name.equals("Ground")) {
+                    label.setBorder(new LineBorder(Color.YELLOW, 1));
+                }
+                // displays frog's name when hovered over
+                else if (name.equals("Frog Label")) {
+                    Frog frog = frogs.get(label);
+
+                    frogNameLabel = new JLabel(frog.getName());
+                    frogNameLabel.setFont(new Font("Serif", Font.PLAIN, 10));
+                    frogNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                    int adjustedWidth = (int) frogNameLabel.getPreferredSize().getWidth() + 5;
+                    frogNameLabel.setSize(adjustedWidth, (int) frogNameLabel.getPreferredSize().getHeight());
+                    // aligns the centers of the frogNameLabel and frog label
+                    int xPos = label.getX() + (label.getWidth() - frogNameLabel.getWidth()) / 2;
+                    frogNameLabel.setLocation(xPos, label.getY() - frogNameLabel.getHeight());
+                    layeredPane.add(frogNameLabel, Integer.valueOf(4));
+
+                    // keeps the position of the frogNameLabel synced with the position of the frog label
+                    nameUpdater = new Timer(50, e1 -> {
+                        int newXPos = label.getX() + (label.getWidth() - frogNameLabel.getWidth()) / 2;
+                        frogNameLabel.setLocation(newXPos, label.getY() - frogNameLabel.getHeight());
+                    });
+                    nameUpdater.start();
+                }
             }
         }
     }
@@ -372,9 +433,23 @@ public class Pond extends JFrame implements MouseListener {
         Object object = e.getSource();
 
         // if the object is a JLabel
-        if (object instanceof JLabel temp) {
-            // removes the border after exiting
-            temp.setBorder(null);
+        if (object instanceof JLabel label) {
+
+            if (label.getName() != null) {
+                String name = label.getName();
+
+                // if label is a background label it removes the highlighting border
+                if (name.equals("Sky") || name.equals("Water") || name.equals("Ground")) {
+                    label.setBorder(null);
+                }
+                // if label is a frog label it removes the name above its head
+                else if (name.equals("Frog Label")) {
+                    frogNameLabel.setVisible(false);
+                    layeredPane.remove(frogNameLabel);
+                    nameUpdater.stop();
+                }
+
+            }
         }
     }
 }
