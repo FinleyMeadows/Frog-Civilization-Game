@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Pond extends JFrame implements MouseListener {
@@ -34,11 +36,18 @@ public class Pond extends JFrame implements MouseListener {
 
     // holds every component in the game
     private JLayeredPane layeredPane;
+    /*
+        - Layer 0: sky, water, ground labels
+        - Layer 1: rock bed label, all resource and time display labels, bubbles
+        - Layer 2: lily pads, bubbles
+        - Layer 3: Swimming frogs, idle frogs on lily pads, bubbles
+        - Layer 4: frog name labels, bubbles
+    */
 
     // background labels
-    private JLabel sky = new JLabel(new ImageIcon("Pictures/Sky.png"));
-    private JLabel water = new JLabel(new ImageIcon("Pictures/Water.png"));
-    private JLabel ground = new JLabel(new ImageIcon("Pictures/Ground.png"));
+    private JLabel sky = new JLabel(loadImage("Pictures/Sky.png"));
+    private JLabel water = new JLabel(loadImage("Pictures/Water.png"));
+    private JLabel ground = new JLabel(loadImage("Pictures/Ground.png"));
 
     // time variables and components
     private JLabel timeLabel = new JLabel();
@@ -95,7 +104,18 @@ public class Pond extends JFrame implements MouseListener {
         spawnFrogs(4);
         // TODO: remove this once done testing
         addLilyPads();
+
+        // TODO: Remove this once done
+        // adding in some idle frogs on the lily pads
+        Frog idleFrog = new Frog();
+        JLabel frogLabel = idleFrog.getDisplayLabel();
+        frogLabel.setIcon(loadImage("Animations/IdleFrog.gif"));
+        frogLabel.setSize(frogLabel.getPreferredSize());
+        frogLabel.setLocation(345, 190);
+        frogs.put(frogLabel, idleFrog);
+        layeredPane.add(frogLabel, Integer.valueOf(3));
     }
+
 
     // - - - I D K - - - //
 
@@ -112,6 +132,7 @@ public class Pond extends JFrame implements MouseListener {
             JLabel frogLabel = swimmingFrog.getDisplayLabel();
             frogLabel.addMouseListener(this);
             frogs.put(frogLabel, swimmingFrog);
+            swimmingFrog.startSwimming();
 
             // adds it to the screen
             layeredPane.add(frogLabel, Integer.valueOf(3));
@@ -176,11 +197,6 @@ public class Pond extends JFrame implements MouseListener {
 
     // - - - T I M E  M A N A G E M E N T - - - //
 
-    public void startDay() {
-
-    }
-
-
     public void initializeTimeComponents() {
         int width = 110;
 
@@ -202,7 +218,7 @@ public class Pond extends JFrame implements MouseListener {
         // updates the text in the time label
         updateTime();
         timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        timeLabel.setIcon(new ImageIcon("Pictures/TimeFrame.png"));
+        timeLabel.setIcon(loadImage("Pictures/TimeFrame.png"));
         timeLabel.setSize(width, timeLabel.getPreferredSize().height);
         timeLabel.setLocation(FRAME_WIDTH - width, 0);
         // adds it to the frame
@@ -281,10 +297,35 @@ public class Pond extends JFrame implements MouseListener {
         layeredPane.add(ground, Integer.valueOf(0));
 
         // adds rocks to the background
-        JLabel rocks = new JLabel(new ImageIcon("Pictures/Rockbed0.png"));
+        JLabel rocks = new JLabel(loadImage("Pictures/Rockbed0 (2).png"));
         rocks.setSize(rocks.getPreferredSize());
         rocks.setLocation(0, 360);
         layeredPane.add(rocks, Integer.valueOf(1));
+    }
+
+    // TODO: remove once done
+    public void addLilyPads() {
+        int randPad;
+
+        // spawns 20 lily pads across the surface of the water
+        for (int i = 0; i < 20; i++) {
+            randPad = (int) (Math.random() * 2);
+
+            JLabel lilyPad = new JLabel();
+
+            // randomly picks between the 2 different variants
+            if (randPad == 1) {
+                lilyPad.setIcon(loadImage("Pictures/LilyPadWithLotus.png"));
+            }
+            else {
+                lilyPad.setIcon(loadImage("Pictures/LilyPad.png"));
+            }
+
+            lilyPad.setSize(lilyPad.getPreferredSize());
+            // evenly spaces out each lily pad across 700 pixels
+            lilyPad.setLocation(i * 30 + i * 7, 203 - lilyPad.getHeight() + 1);
+            layeredPane.add(lilyPad, Integer.valueOf(2));
+        }
     }
 
     private void startBackgroundEffects() {
@@ -294,37 +335,46 @@ public class Pond extends JFrame implements MouseListener {
             if (bubbleChance == 15) {
                 int bubbleX = (int) (Math.random() * 668);
                 // plays the bubble animations
-                playAnimation(new ImageIcon("Animations/BubbleGif.gif"), bubbleX,
-                        200, 32, 300, 3375);
+                spawnBubbles(bubbleX);
+                /*
+                    playAnimation(loadImage("Animations/BubbleGif.gif"), bubbleX,
+                            200, 32, 300, 3375);
+                */
             }
         });
         backgroundEffectsTimer.start();
     }
 
-    // TEMP method
-    public void addLilyPads() {
-        int randPad;
-
-        for (int i = 0; i < 20; i++) {
-            randPad = (int) (Math.random() * 2);
-
-            JLabel lilyPad = new JLabel();
-
-            if (randPad == 1) {
-                lilyPad.setIcon(new ImageIcon("Pictures/LilyPadWithLotus.png"));
-            }
-            else {
-                lilyPad.setIcon(new ImageIcon("Pictures/LilyPad.png"));
-            }
-
-            lilyPad.setSize(lilyPad.getPreferredSize());
-            lilyPad.setLocation(i * 30 + i * 7, 203 - lilyPad.getHeight() + 1);
-            layeredPane.add(lilyPad, Integer.valueOf(2));
-        }
-    }
-
     // - - - A N I M A T I O N - - - //
 
+    private void spawnBubbles(int randX) {
+        ImageIcon bubbles = loadImage("Animations/BubbleGif.gif");
+
+        // does a weird work-around to reset the gif each time a new one is created
+        Image rerenderedImage = bubbles.getImage().getScaledInstance(32, 300, Image.SCALE_REPLICATE);
+        JLabel bubbleAnimation = new JLabel(new ImageIcon(rerenderedImage));
+        bubbleAnimation.setSize(32, 300);
+        // spawns somewhere on the pond floor so y stays constant
+        bubbleAnimation.setLocation(randX, 200);
+        // bubble spawns somewhere random on the z-axis between layers [1-4]
+        layeredPane.add(bubbleAnimation, Integer.valueOf((int) (Math.random() * 4) + 1));
+
+        // creates a timer to control the animation's duration
+        Timer animationTimer = new Timer(3375, e -> {
+            // stop the animation and clean up
+            bubbleAnimation.setVisible(false);
+            layeredPane.remove(bubbleAnimation);
+            layeredPane.revalidate();
+            layeredPane.repaint();
+        });
+
+        // ensure the timer runs only once
+        animationTimer.setRepeats(false);
+        animationTimer.start();
+    }
+
+    // TODO: IDK if I actually need this method because the only thing animated rn is the bubbles and
+    //  this method was designed for general use, not specialized
     private void playAnimation(ImageIcon gif, int x, int y, int width, int height, int duration) {
         // does a weird work-around to reset the gif each time a new one is created
         Image rerenderedImage = gif.getImage().getScaledInstance(width, height, Image.SCALE_REPLICATE);
@@ -334,7 +384,6 @@ public class Pond extends JFrame implements MouseListener {
         animation.setLocation(x, y);
 
         // add the animation to the layeredPane
-        animation.setVisible(true);
         layeredPane.add(animation, Integer.valueOf(4));
 
         // creates a timer to control the animation's duration
@@ -350,6 +399,24 @@ public class Pond extends JFrame implements MouseListener {
         animationTimer.setRepeats(false);
         animationTimer.start();
     }
+
+    // - - - A C T I O N S  &  U P G R A D E S - - - //
+
+    // - - - M I S C E L L A N E O U S - - - //
+
+    // checks for valid files paths
+    public ImageIcon loadImage(String filePath) {
+        // if the file path exists it returns the referenced ImageIcon
+        if (Files.exists(Path.of(filePath))) {
+            return new ImageIcon(filePath);
+        }
+        // if the path does not exist it prints out the file path and throws a NullPointerException
+        else {
+            System.out.println("Error: " + filePath + " does not exist");
+            return null;
+        }
+    }
+
 
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
 

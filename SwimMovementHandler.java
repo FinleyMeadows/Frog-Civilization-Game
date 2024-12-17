@@ -42,9 +42,6 @@ public class SwimMovementHandler {
         if (((int) (Math.random() * 2)) == 1) {
             movementDirections[1] *= -1;
         }
-
-        // TODO: create 2 different methods: moveFrog() & moveTadpole()
-        moveFrog();
     }
 
     // this method must be run after the frog is added to the water

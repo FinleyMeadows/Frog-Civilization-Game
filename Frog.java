@@ -47,6 +47,13 @@ public class Frog {
         return names[(int) (Math.random() * names.length)];
     }
 
+    public void startSwimming() {
+        swimPos.moveFrog();
+    }
+
+    public void stopSwimming() {
+    }
+
     private void randomizeCoords() {
         int x = (int) (Math.random() * (Pond.FRAME_WIDTH - displayLabel.getWidth()));
         int y = (int) (Math.random() * (307 - displayLabel.getHeight())) + 203;
