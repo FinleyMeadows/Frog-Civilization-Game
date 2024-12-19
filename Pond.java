@@ -44,7 +44,7 @@ public class Pond extends JFrame implements MouseListener {
         - Layer 4: frog name labels, bubbles
     */
 
-    // background labels
+    // background components
     private JLabel sky = new JLabel(loadImage("Pictures/Sky.png"));
     private JLabel water = new JLabel(loadImage("Pictures/Water.png"));
     private JLabel ground = new JLabel(loadImage("Pictures/Ground.png"));
@@ -297,7 +297,7 @@ public class Pond extends JFrame implements MouseListener {
         layeredPane.add(ground, Integer.valueOf(0));
 
         // adds rocks to the background
-        JLabel rocks = new JLabel(loadImage("Pictures/Rockbed0 (2).png"));
+        JLabel rocks = new JLabel(loadImage("Pictures/Rockbed1.png"));
         rocks.setSize(rocks.getPreferredSize());
         rocks.setLocation(0, 360);
         layeredPane.add(rocks, Integer.valueOf(1));
@@ -343,6 +343,10 @@ public class Pond extends JFrame implements MouseListener {
             }
         });
         backgroundEffectsTimer.start();
+    }
+
+    public void simulateBurrows() {
+
     }
 
     // - - - A N I M A T I O N - - - //

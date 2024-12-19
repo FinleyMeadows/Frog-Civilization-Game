@@ -207,7 +207,7 @@ public class SwimMovementHandler {
         }
     }
 
-    // returns the 'n', 'e', 's', or 'w' for the border being hit
+    // returns the 'n', 'e', 's', or 'w' border being violated
     private char getBorderContact() {
         // west border (left wall)
         if (xPos < 0) {
@@ -275,7 +275,7 @@ public class SwimMovementHandler {
         }
     }
 
-    // returns true if the point is in bounds and false if not
+    // returns true if the frog is out of bounds
     private boolean inBounds() {
         return xPos >= 0 && yPos >= 203 && xPos + frog.getLabelWidth() <= Pond.FRAME_WIDTH &&
                 yPos + frog.getLabelHeight() <= 510;
