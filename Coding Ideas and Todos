@@ -91,7 +91,9 @@ Coding Ideas:
     the window. This can be helpful when trying to run animations or other background tasks without interruption
 
 TODOs:
-1. Code the Collect Plant Food action
+1. Code the Grow Plant Food action
+   - This action should take 1 hour to grow a number of plant food based on this equation: ???. This will add the amount of food gained
+to the total food in the players display. This should also modify the RockBed sprite to show more food if it passes a certain threshold.
 2. Code the Collect Bug Food action
 4. Code the Create A Frog Home action
 5. Code the Add Lily Pad to Pond action
