@@ -94,8 +94,14 @@ TODOs:
 1. Code the Grow Plant Food action
    - This action should take 1 hour to grow a number of plant food based on this equation: ???. This will add the amount of food gained
 to the total food in the players display. This should also modify the RockBed sprite to show more food if it passes a certain threshold.
+
 2. Code the Collect Bug Food action
+   - This action should take 1 hour to collect a number of bugs based on this equation: ???. This will add the amount of bugs collect to
+the total bug food stat in the players display. This will also potentially change the number of bugs displayed in the sky, based on the number of bugs the player currently has.
+
 4. Code the Create A Frog Home action
+   - This action will require 4 hours and will create a decorated, homey, burrow that 5 frogs can live in. The burrows will already appear on the screen but they will be unihabited
+and unlivable.
 5. Code the Add Lily Pad to Pond action
 6. Create a display for different statistics
 7. Code a way to track time
