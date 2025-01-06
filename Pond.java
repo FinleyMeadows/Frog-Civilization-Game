@@ -49,6 +49,9 @@ public class Pond extends JFrame implements MouseListener {
     private JLabel water = new JLabel(loadImage("Pictures/Water.png"));
     private JLabel ground = new JLabel(loadImage("Pictures/Ground.png"));
 
+    // holds all the burrows in a grid layout
+    private JPanel burrowPanel = new JPanel();
+
     // time variables and components
     private JLabel timeLabel = new JLabel();
     private JLabel bedtimeLabel = new JLabel();
@@ -104,41 +107,18 @@ public class Pond extends JFrame implements MouseListener {
         spawnFrogs(4);
         // TODO: remove this once done testing
         addLilyPads();
+        simulateBurrows();
 
         // TODO: Remove this once done
         // adding in some idle frogs on the lily pads
         Frog idleFrog = new Frog();
         JLabel frogLabel = idleFrog.getDisplayLabel();
+        frogLabel.setName("Frog Label");
         frogLabel.setIcon(loadImage("Animations/IdleFrog.gif"));
         frogLabel.setSize(frogLabel.getPreferredSize());
         frogLabel.setLocation(345, 190);
         frogs.put(frogLabel, idleFrog);
         layeredPane.add(frogLabel, Integer.valueOf(3));
-    }
-
-
-    // - - - I D K - - - //
-
-    // spawns n amount of frogs
-    public int spawnFrogs(int n) {
-        if (n == 0) {
-            return 0;
-        }
-        else {
-            Frog swimmingFrog = new Frog();
-            // immediately grows the frog into stage 3: "Frog"
-            swimmingFrog.growFrog();
-            swimmingFrog.growFrog();
-            JLabel frogLabel = swimmingFrog.getDisplayLabel();
-            frogLabel.addMouseListener(this);
-            frogs.put(frogLabel, swimmingFrog);
-            swimmingFrog.startSwimming();
-
-            // adds it to the screen
-            layeredPane.add(frogLabel, Integer.valueOf(3));
-
-            return spawnFrogs(n - 1);
-        }
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
@@ -346,7 +326,28 @@ public class Pond extends JFrame implements MouseListener {
     }
 
     public void simulateBurrows() {
+        // 680 x 170
+        // 59 x 80
 
+        // sets size equal to the dimensions of the ground
+        burrowPanel.setSize(ground.getWidth() - 20, ground.getHeight() - 20);
+        // sets location equal to the location of the ground
+        burrowPanel.setLocation(ground.getX() + 10, ground.getY() + 10);
+        // creates a 2x10 grid layout with 5pixel horizontal and vertical gaps
+        burrowPanel.setLayout(new GridLayout(2, 10, 10, 10));
+        // makes the background transparent
+        burrowPanel.setOpaque(false);
+
+        // adds 20 black JLabels to simulate the spaces the burrows will occupy
+        for (int i = 0; i < 20; i++) {
+            JLabel burrowLabel = new JLabel();
+            burrowLabel.setSize(59, 80);
+            burrowLabel.setIcon(new ImageIcon("Pictures/BurrowEx.png"));
+            // burrowLabel.setBackground(new Color(84, 66, 28));
+            burrowPanel.add(burrowLabel);
+        }
+
+        layeredPane.add(burrowPanel, Integer.valueOf(1));
     }
 
     // - - - A N I M A T I O N - - - //
@@ -421,6 +422,27 @@ public class Pond extends JFrame implements MouseListener {
         }
     }
 
+    // spawns n amount of frogs
+    public int spawnFrogs(int n) {
+        if (n == 0) {
+            return 0;
+        }
+        else {
+            Frog swimmingFrog = new Frog();
+            // immediately grows the frog into stage 3: "Frog"
+            swimmingFrog.growFrog();
+            swimmingFrog.growFrog();
+            JLabel frogLabel = swimmingFrog.getDisplayLabel();
+            frogLabel.addMouseListener(this);
+            frogs.put(frogLabel, swimmingFrog);
+            swimmingFrog.startSwimming();
+
+            // adds it to the screen between layers 1-4
+            layeredPane.add(frogLabel, Integer.valueOf((int) (Math.random() * 4) + 1));
+
+            return spawnFrogs(n - 1);
+        }
+    }
 
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
 
