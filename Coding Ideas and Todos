@@ -58,42 +58,24 @@ Light traps could be bought (time is spent) to collect a certain number of bugs 
 
 Shovels could be acquired to lessen the amount of time it takes to dig homes for the frogs. 
 
- 
-
-The real question is how does the player acquire these items?? The player can search for items and probably has an allowance that allows them to buy other items/upgrades.
+The player can search for items and probably has an allowance that allows them to buy other items/upgrades.
 
 
- 
 
-Actions: 
-
-Search for plant food; Spend 1 hour to gather 1 - 3 plant food.
-
-Search for bugs; Spend 1 hour to gather 2 - 4 bugs. 
-
-Maybe?? Go to the store to buy bugs and plant food?;
-
-Clean the water; Spend 2 hours to purify the water to 0% contamination
-
-Add a home for frogs; Spend 5 hours to build 1 burrow.
-
-Search for loot; ? Hours 
-
-Add a lily pad to the pond; 1 hour to add one lily pad 
-
-Add a zone for frogs to lay eggs; THIS IS PROBABLY UNNEEDED
-
- 
-
-Coding Ideas:
-- Use the glass pane for animations:
-    The glass pane is a transparent component that can be used to block user interaction with
-    the window. This can be helpful when trying to run animations or other background tasks without interruption
 
 TODOs:
-1. Code the Collect Plant Food action
+1. Code the Grow Plant Food action
+   - This action should take 1 hour to grow a number of plant food based on this equation: ???. This will add the amount of food gained
+to the total food in the players display. This should also modify the RockBed sprite to show more food if it passes a certain threshold.
+
 2. Code the Collect Bug Food action
+   - This action should take 1 hour to collect a number of bugs based on this equation: ???. This will add the amount of bugs collect to
+the total bug food stat in the players display. This will also potentially change the number of bugs displayed in the sky, based on the number of bugs the player currently has.
+
 4. Code the Create A Frog Home action
+   - This action will require 4 hours and will create a decorated, homey, burrow that 5 frogs can live in. The burrows will already appear on the screen but they will be unihabited
+and empty. Once the burrow is decorated and furnished, 5 frogs can inhabit the burrow each night. Either an ArrayList or map should probably be created to allow traversal of frogs and if their 'hasHome' variable is true. As the player sleeps each night, there is a check that the number of frogs that have a home and the number of burrows multiplied by five are equal to each other. If they are not equal, frogs should be selected to have a house until the burrow space and number of housed frogs is equal. The biggest reasons these numbers would not be equal are if 1. a new burrow is created or 2. a currently housed frog dies, in the which case a new frog should take their spot. All of these checks should happen before a frogs survival is calculated to insure correct calculations.
+
 5. Code the Add Lily Pad to Pond action
 6. Create a display for different statistics
 7. Code a way to track time
@@ -114,7 +96,6 @@ TODOs:
    - Create a "new day" screen that displays the current day and the all of the resource changes that happened overnight.
 10. Make Custom Buttons
 EXTRAs:
-1. Code the Add Zone for Frogs to lay eggs action
 2. Add tools and items, as well as the Search for Loot action
 3. Code the Clean the Water action
    - Create different water arts to show dirtiness
