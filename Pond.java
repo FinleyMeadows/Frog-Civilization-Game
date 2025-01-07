@@ -42,6 +42,8 @@ public class Pond extends JFrame implements MouseListener {
         - Layer 2: lily pads, bubbles
         - Layer 3: Swimming frogs, idle frogs on lily pads, bubbles
         - Layer 4: frog name labels, bubbles
+        - Layer 5: action menu
+        - Layer 6: menu button
     */
 
     // background components
@@ -55,12 +57,17 @@ public class Pond extends JFrame implements MouseListener {
     // time variables and components
     private JLabel timeLabel = new JLabel();
     private JLabel bedtimeLabel = new JLabel();
-    private JLabel nextDayLabel = new JLabel();
+    private JLabel nextDayButton = new JLabel();
 
     // label that displays the frogs name above its image
     private JLabel frogNameLabel;
     // keeps the position of the frog's name synced with the position of the frog's label
     private Timer nameUpdater;
+
+    // button (actually a JLabel) used to open the menu
+    private JLabel menuButton = new JLabel();
+    // the actual menu (this will be on the layer below the button so the button remains visible)
+    private JPanel menu = new JPanel();
 
     // - - - M A P S - - - //
 
@@ -101,6 +108,10 @@ public class Pond extends JFrame implements MouseListener {
         initializeItemDisplayLabels();
         // create the time and time functions in the top right of the frame
         initializeTimeComponents();
+        // adds in the menu
+        addMenuButton();
+        // creates the menu
+        createMenu();
         // starts the bubble animations in the water
         startBackgroundEffects();
         // spawns the 4 initial frogs
@@ -113,7 +124,7 @@ public class Pond extends JFrame implements MouseListener {
         // adding in some idle frogs on the lily pads
         Frog idleFrog = new Frog();
         JLabel frogLabel = idleFrog.getDisplayLabel();
-        frogLabel.setName("Frog Label");
+        frogLabel.setName("FrogLabel");
         frogLabel.setIcon(loadImage("Animations/IdleFrog.gif"));
         frogLabel.setSize(frogLabel.getPreferredSize());
         frogLabel.setLocation(345, 190);
@@ -200,9 +211,10 @@ public class Pond extends JFrame implements MouseListener {
         timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         timeLabel.setIcon(loadImage("Pictures/TimeFrame.png"));
         timeLabel.setSize(width, timeLabel.getPreferredSize().height);
+        System.out.println("Clock Size: " + timeLabel.getSize());
         timeLabel.setLocation(FRAME_WIDTH - width, 0);
         // adds it to the frame
-        layeredPane.add(timeLabel, Integer.valueOf(1));
+        layeredPane.add(timeLabel, Integer.valueOf(6));
 
         // formats the bedtime label:
         bedtimeLabel.setFont(new Font("Serif", Font.PLAIN, 15));
@@ -210,18 +222,18 @@ public class Pond extends JFrame implements MouseListener {
         bedtimeLabel.setSize(width, timeLabel.getPreferredSize().height);
         bedtimeLabel.setLocation(FRAME_WIDTH - width, timeLabel.getY() + timeLabel.getHeight());
         // adds it to the frame
-        layeredPane.add(bedtimeLabel, Integer.valueOf(1));
+        layeredPane.add(bedtimeLabel, Integer.valueOf(6));
 
         // formats next day button:
-        nextDayLabel.setName("Next Day Label");
-        nextDayLabel.setFont(new Font("Serif", Font.PLAIN, 20));
-        nextDayLabel.setText("Next Day");
+        nextDayButton.setName("NextDayButton");
+        nextDayButton.setFont(new Font("Serif", Font.PLAIN, 20));
+        nextDayButton.setText("Next Day");
         // moves to next day when clicked
-        nextDayLabel.addMouseListener(this);
-        nextDayLabel.setSize(width, timeLabel.getPreferredSize().height);
-        nextDayLabel.setLocation(FRAME_WIDTH - width, bedtimeLabel.getY() + bedtimeLabel.getHeight());
+        nextDayButton.addMouseListener(this);
+        nextDayButton.setSize(width, timeLabel.getPreferredSize().height);
+        nextDayButton.setLocation(FRAME_WIDTH - width, bedtimeLabel.getY() + bedtimeLabel.getHeight());
         // adds it to the frame
-        layeredPane.add(nextDayLabel, Integer.valueOf(1));
+        layeredPane.add(nextDayButton, Integer.valueOf(1));
     }
 
     // updates the time label
@@ -259,21 +271,18 @@ public class Pond extends JFrame implements MouseListener {
         // adds the SKY to the background
         sky.setName("Sky");
         sky.setSize(sky.getPreferredSize());
-        sky.addMouseListener(this);
         layeredPane.add(sky, Integer.valueOf(0));
 
         // adds the WATER to the background
         water.setName("Water");
         water.setSize(water.getPreferredSize());
         water.setLocation(0, sky.getHeight());
-        water.addMouseListener(this);
         layeredPane.add(water, Integer.valueOf(0));
 
         // adds the GROUND to the background
         ground.setName("Ground");
         ground.setSize(ground.getPreferredSize());
         ground.setLocation(0, water.getY() + water.getHeight());
-        ground.addMouseListener(this);
         layeredPane.add(ground, Integer.valueOf(0));
 
         // adds rocks to the background
@@ -342,7 +351,7 @@ public class Pond extends JFrame implements MouseListener {
         for (int i = 0; i < 20; i++) {
             JLabel burrowLabel = new JLabel();
             burrowLabel.setSize(59, 80);
-            burrowLabel.setIcon(new ImageIcon("Pictures/BurrowEx.png"));
+            burrowLabel.setIcon(new ImageIcon("Pictures/Burrow" + ((int) (Math.random() * 8) + 1) + ".png"));
             // burrowLabel.setBackground(new Color(84, 66, 28));
             burrowPanel.add(burrowLabel);
         }
@@ -405,7 +414,33 @@ public class Pond extends JFrame implements MouseListener {
         animationTimer.start();
     }
 
-    // - - - A C T I O N S  &  U P G R A D E S - - - //
+    // - - - M E N U  M E T H O D S - - - //
+
+    public void addMenuButton() {
+        menuButton.setText("Action Menu");
+        menuButton.setFont(new Font("Serif", Font.PLAIN, 20));
+        menuButton.setSize(146, 42);
+        menuButton.setIcon(loadImage("Pictures/MenuButtonBackground.png"));
+        System.out.println("Menu Button: " + menuButton.getSize());
+        menuButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        menuButton.setLocation(350 - menuButton.getWidth() / 2, 0);
+        menuButton.addMouseListener(this);
+        menuButton.setName("MenuButton");
+        layeredPane.add(menuButton, Integer.valueOf(6));
+    }
+
+    public void createMenu() {
+        menu.setSize(700, 700);
+        menu.setLayout(null);
+        JLabel menuBackground = new JLabel();
+        menuBackground.setSize(700, 700);
+        menuBackground.setIcon(loadImage("Pictures/MenuBackground.png"));
+        menu.add(menuBackground);
+        menu.setVisible(false);
+        layeredPane.add(menu, Integer.valueOf(5));
+        menu.revalidate();
+        System.out.println(menuBackground.getLocation());
+    }
 
     // - - - M I S C E L L A N E O U S - - - //
 
@@ -462,12 +497,14 @@ public class Pond extends JFrame implements MouseListener {
             // (all JLabels with mouseListeners added should be named)
             if (temp.getName() != null) {
                 String name = temp.getName();
-                // if that JLabel is a background label (the sky, water, or ground)
-                if (name.equals("Sky") || name.equals("Water") || name.equals("Ground")) {
-                    // TODO: open the action menu correlated with the label
-                }
-                else if (name.equals("Next Day Label")) {
+
+                // if clicking the next day
+                if (name.equals("NextDayButton")) {
                     // TODO: go to next day
+                }
+                else if (name.equals("MenuButton")) {
+                    // opens and closes the menu
+                    menu.setVisible(!menu.isVisible());
                 }
 
             }
@@ -492,11 +529,11 @@ public class Pond extends JFrame implements MouseListener {
                 String name = label.getName();
 
                 // if it's a background label it highlights the border
-                if (name.equals("Sky") || name.equals("Water") || name.equals("Ground")) {
+                if (name.equals("MenuButton") || name.equals("NextDayButton")) {
                     label.setBorder(new LineBorder(Color.YELLOW, 1));
                 }
                 // displays frog's name when hovered over
-                else if (name.equals("Frog Label")) {
+                else if (name.equals("FrogLabel")) {
                     Frog frog = frogs.get(label);
 
                     frogNameLabel = new JLabel(frog.getName());
@@ -532,11 +569,11 @@ public class Pond extends JFrame implements MouseListener {
                 String name = label.getName();
 
                 // if label is a background label it removes the highlighting border
-                if (name.equals("Sky") || name.equals("Water") || name.equals("Ground")) {
+                if (name.equals("MenuButton") || name.equals("NextDayButton")) {
                     label.setBorder(null);
                 }
                 // if label is a frog label it removes the name above its head
-                else if (name.equals("Frog Label")) {
+                else if (name.equals("FrogLabel")) {
                     frogNameLabel.setVisible(false);
                     layeredPane.remove(frogNameLabel);
                     nameUpdater.stop();
