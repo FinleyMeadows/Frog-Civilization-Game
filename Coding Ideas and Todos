@@ -46,19 +46,12 @@ Tadpoles growing into frogs could have an 80% chance of happening rather than it
 
 Water cleanliness could give the frogs a percentage of death, as the days pass, which could range from 1–10%, depending on the dirtiness of the water. 
 
-Bugs could have a small chance (like 7%) of leaving the pond area each round, to prevent the mass stocking of bugs and to add another element to the game. 
-
- 
 
 Upgrades/Tools: 
 
-A water filter could be installed for a high cost of time and could clean the water a certain amount each day. 
+Tools and Upgrades will occasionally pop up in any players game. any tool can have a starting percentage like 0.5% that it will be given to the play as they pass time. As the player does different actions it could slightly increase the chances of acquring one of these items. for example, the chance of gaining the bug net increases by 1% everytime the player does the action to catch bugs.  
 
-Light traps could be bought (time is spent) to collect a certain number of bugs each day. 
 
-Shovels could be acquired to lessen the amount of time it takes to dig homes for the frogs. 
-
-The player can search for items and probably has an allowance that allows them to buy other items/upgrades.
 
 
 WHAT DOES THE MENU ACTUALLY LOOK LIKE:
@@ -66,11 +59,11 @@ WHAT DOES THE MENU ACTUALLY LOOK LIKE:
 
 TODOs:
 1. Code the Grow Plant Food action
-   - This action should take 1 hour to grow a number of plant food based on this equation: ???. This will add the amount of food gained
+   - This action should take 1 hour to grow a number of plant food based on this equation: random number between 1 and 30. This will add the amount of food gained
 to the total food in the players display. This should also modify the RockBed sprite to show more food if it passes a certain threshold.
 
 2. Code the Collect Bug Food action
-   - This action should take 1 hour to collect a number of bugs based on this equation: ???. This will add the amount of bugs collect to
+   - This action should take 1 hour to collect a number of bugs based on this equation: random number between 1 and 30. This will add the amount of bugs collect to
 the total bug food stat in the players display. This will also potentially change the number of bugs displayed in the sky, based on the number of bugs the player currently has.
 
 4. Code the Create A Frog Home action
