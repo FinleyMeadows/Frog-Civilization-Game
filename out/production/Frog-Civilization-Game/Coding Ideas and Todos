@@ -61,6 +61,7 @@ Shovels could be acquired to lessen the amount of time it takes to dig homes for
 The player can search for items and probably has an allowance that allows them to buy other items/upgrades.
 
 
+WHAT DOES THE MENU ACTUALLY LOOK LIKE:
 
 
 TODOs:
@@ -81,10 +82,8 @@ and empty. Once the burrow is decorated and furnished, 5 frogs can inhabit the b
 7. Code a way to track time
 8. Create Art
    - Eggs
-   - Burrow
-   - lily pad
    - bugs
-   - plant food (algae)
+   - empty burrow
    - 
 9. Code the day system
    - Calculates frogs survival

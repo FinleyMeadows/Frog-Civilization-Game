@@ -68,6 +68,13 @@ public class Pond extends JFrame implements MouseListener {
     private JLabel menuButton = new JLabel();
     // the actual menu (this will be on the layer below the button so the button remains visible)
     private JPanel menu = new JPanel();
+    // shows the population / capacity of a burrow
+    private JTextArea populationTextArea;
+    // stores the component that was last entered
+    // this aims to solve the problem where when the mouse is inside the populationTextArea it thinks it's exiting
+    // the burrowLabel when really it's still inside it, the happens because the populationTextArea is on a higher
+    // layer than the burrowLabel
+    private JLabel burrowEntered;
 
     // - - - M A P S - - - //
 
@@ -76,10 +83,12 @@ public class Pond extends JFrame implements MouseListener {
     // stores all the frogs and their display labels
     private Map<JLabel, Frog> frogs = new HashMap<JLabel, Frog>();
 
-    // - - - A R R A Y L I S T S - - - //
+    // - - - L I S T S  &  A R R A Y S - - - //
 
     // stores all the display labels
     private ArrayList<JLabel> displayLabels = new ArrayList<JLabel>();
+    // stores all the burrow images
+    private final Burrow[] burrows = new Burrow[20];
 
     // contains all the functions of the game
     public Pond() {
@@ -118,7 +127,7 @@ public class Pond extends JFrame implements MouseListener {
         spawnFrogs(4);
         // TODO: remove this once done testing
         addLilyPads();
-        simulateBurrows();
+        addBurrows();
 
         // TODO: Remove this once done
         // adding in some idle frogs on the lily pads
@@ -264,6 +273,11 @@ public class Pond extends JFrame implements MouseListener {
         }
     }
 
+    public void spendTime(int numHours) {
+        time += numHours;
+        updateTime();
+    }
+
 
     // - - - B A C K G R O U N D - - - //
 
@@ -334,7 +348,7 @@ public class Pond extends JFrame implements MouseListener {
         backgroundEffectsTimer.start();
     }
 
-    public void simulateBurrows() {
+    public void addBurrows() {
         // 680 x 170
         // 59 x 80
 
@@ -347,16 +361,69 @@ public class Pond extends JFrame implements MouseListener {
         // makes the background transparent
         burrowPanel.setOpaque(false);
 
-        // adds 20 black JLabels to simulate the spaces the burrows will occupy
-        for (int i = 0; i < 20; i++) {
+        // creates all the empty burrows and adds them to the screen
+        for (int i = 0; i < burrows.length; i++) {
+            // picks a random empty burrow image
+            Burrow burrow = new Burrow(loadImage("Pictures/EmptyBurrow" + ((int) (Math.random() * 5) + 1) + ".png"));
+            // assigns a couple locations for frogs to rest in each one of the burrows
+            setBurrowPositions();
+
+            // creates a label to hold the burrow
             JLabel burrowLabel = new JLabel();
             burrowLabel.setSize(59, 80);
-            burrowLabel.setIcon(new ImageIcon("Pictures/Burrow" + ((int) (Math.random() * 8) + 1) + ".png"));
-            // burrowLabel.setBackground(new Color(84, 66, 28));
+            burrowLabel.setIcon(burrow.getImage());
+            burrowLabel.addMouseListener(this);
+            burrowLabel.setName("Burrow" + i);
+            System.out.println(burrowLabel.getName());
+
+            burrows[i] = burrow;
             burrowPanel.add(burrowLabel);
         }
 
         layeredPane.add(burrowPanel, Integer.valueOf(1));
+    }
+
+    public void setBurrowPositions() {
+
+    }
+
+    public void displayBurrowPopulation(JLabel label, String name) {
+        // +20 pixels to account for the offset of the burrowPanel x
+        int burrowX = label.getX() + 10;
+        // +530 pixels to account for the offset of the burrowPanel y
+        int burrowY = label.getY() + 520;
+        // dimensions of the burrow
+        int burrowWidth = label.getWidth();
+        int burrowHeight = label.getHeight();
+        // the number of the burrow [0-19]
+        int burrowNum = Integer.parseInt(name.substring(name.indexOf("w") + 1));
+        System.out.println(burrowNum);
+        Burrow burrow = burrows[burrowNum];
+        System.out.println(burrowNum);
+
+        // creates a label to display the population of the burrow
+        populationTextArea = new JTextArea(" " + burrow.getNumFrogs() + " \n---\n 5 ") {
+            @Override
+            public boolean contains(int x, int y) {
+                // return false to make this component transparent to mouse events
+                return false;
+            }
+        };
+        populationTextArea.setName("PopulationTextArea");
+        populationTextArea.setForeground(Color.white);
+        populationTextArea.setFont(new Font("Serif", Font.PLAIN, 15));
+        populationTextArea.setSize(populationTextArea.getPreferredSize());
+        populationTextArea.addMouseListener(this);
+        // makes the background transparent so just the text is showing
+        populationTextArea.setOpaque(false);
+        populationTextArea.setEnabled(false);
+
+        // calculating the positioning of the populationTextArea in order to keep it centered in the burrowLabel
+        int xPos = (burrowWidth - populationTextArea.getWidth()) / 2 + burrowX;
+        int yPos = (burrowHeight - populationTextArea.getHeight()) / 2 + burrowY;
+
+        populationTextArea.setLocation(xPos, yPos);
+        layeredPane.add(populationTextArea, Integer.valueOf(10));
     }
 
     // - - - A N I M A T I O N - - - //
@@ -479,6 +546,27 @@ public class Pond extends JFrame implements MouseListener {
         }
     }
 
+    public void displayFrogName(JLabel frogLabel) {
+        Frog frog = frogs.get(frogLabel);
+
+        frogNameLabel = new JLabel(frog.getName());
+        frogNameLabel.setFont(new Font("Serif", Font.PLAIN, 10));
+        frogNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        int adjustedWidth = (int) frogNameLabel.getPreferredSize().getWidth() + 5;
+        frogNameLabel.setSize(adjustedWidth, (int) frogNameLabel.getPreferredSize().getHeight());
+        // aligns the centers of the frogNameLabel and frog label
+        int xPos = frogLabel.getX() + (frogLabel.getWidth() - frogNameLabel.getWidth()) / 2;
+        frogNameLabel.setLocation(xPos, frogLabel.getY() - frogNameLabel.getHeight());
+        layeredPane.add(frogNameLabel, Integer.valueOf(4));
+
+        // keeps the position of the frogNameLabel synced with the position of the frog label
+        nameUpdater = new Timer(50, e1 -> {
+            int newXPos = frogLabel.getX() + (frogLabel.getWidth() - frogNameLabel.getWidth()) / 2;
+            frogNameLabel.setLocation(newXPos, frogLabel.getY() - frogNameLabel.getHeight());
+        });
+        nameUpdater.start();
+    }
+
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
 
     @Override
@@ -532,26 +620,16 @@ public class Pond extends JFrame implements MouseListener {
                 if (name.equals("MenuButton") || name.equals("NextDayButton")) {
                     label.setBorder(new LineBorder(Color.YELLOW, 1));
                 }
-                // displays frog's name when hovered over
+                // displays frog's name
                 else if (name.equals("FrogLabel")) {
-                    Frog frog = frogs.get(label);
-
-                    frogNameLabel = new JLabel(frog.getName());
-                    frogNameLabel.setFont(new Font("Serif", Font.PLAIN, 10));
-                    frogNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                    int adjustedWidth = (int) frogNameLabel.getPreferredSize().getWidth() + 5;
-                    frogNameLabel.setSize(adjustedWidth, (int) frogNameLabel.getPreferredSize().getHeight());
-                    // aligns the centers of the frogNameLabel and frog label
-                    int xPos = label.getX() + (label.getWidth() - frogNameLabel.getWidth()) / 2;
-                    frogNameLabel.setLocation(xPos, label.getY() - frogNameLabel.getHeight());
-                    layeredPane.add(frogNameLabel, Integer.valueOf(4));
-
-                    // keeps the position of the frogNameLabel synced with the position of the frog label
-                    nameUpdater = new Timer(50, e1 -> {
-                        int newXPos = label.getX() + (label.getWidth() - frogNameLabel.getWidth()) / 2;
-                        frogNameLabel.setLocation(newXPos, label.getY() - frogNameLabel.getHeight());
-                    });
-                    nameUpdater.start();
+                    displayFrogName(label);
+                }
+                // displays the population / 5 of a burrow
+                else if (name.contains("Burrow")) {
+                    System.out.println(label.getLocation());
+                    System.out.println(name);
+                    displayBurrowPopulation(label, name);
+                    burrowEntered = label;
                 }
             }
         }
@@ -578,7 +656,13 @@ public class Pond extends JFrame implements MouseListener {
                     layeredPane.remove(frogNameLabel);
                     nameUpdater.stop();
                 }
-
+                // if exiting a burrow
+                else if (name.contains("Burrow")) {
+                    // deletes the population / capacity JTextArea fraction from the screen
+                    populationTextArea.setVisible(false);
+                    layeredPane.remove(populationTextArea);
+                    System.out.println("Exited Burrow");
+                }
             }
         }
     }

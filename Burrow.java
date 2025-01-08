@@ -8,6 +8,8 @@ public class Burrow {
     private Map<Point, Boolean> frogPositions = new HashMap<Point, Boolean>();
     // stores the burrow's image
     private ImageIcon image;
+    // stores the number of frogs in the burrow out of 5
+    private int numFrogs = 0;
 
     public Burrow(ImageIcon image) {
         this.image = image;
@@ -34,7 +36,18 @@ public class Burrow {
         frogPositions.put(new Point(x, y), false);
     }
 
+    public void addFrogs(int additionalFrogs) {
+        numFrogs += additionalFrogs;
+        if (numFrogs >= 5) {
+            System.out.println("This burrow is full");
+        }
+    }
+
     public ImageIcon getImage() {
         return image;
+    }
+
+    public int getNumFrogs() {
+        return numFrogs;
     }
 }
