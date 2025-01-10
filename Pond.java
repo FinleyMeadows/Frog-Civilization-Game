@@ -55,7 +55,7 @@ public class Pond extends JFrame implements MouseListener {
     private JPanel burrowPanel = new JPanel();
 
     // time variables and components
-    private JLabel timeLabel = new JLabel();
+    private JLabel clock = new JLabel();
     private JLabel bedtimeLabel = new JLabel();
     private JLabel nextDayButton = new JLabel();
 
@@ -64,29 +64,26 @@ public class Pond extends JFrame implements MouseListener {
     // keeps the position of the frog's name synced with the position of the frog's label
     private Timer nameUpdater;
 
-    // button (actually a JLabel) used to open the menu
-    private JLabel menuButton = new JLabel();
-    // the actual menu (this will be on the layer below the button so the button remains visible)
-    private JPanel menu = new JPanel();
+    // this is basically the player's inventory of items and actions
+    private JLabel menuBar = new JLabel();
+
     // shows the population / capacity of a burrow
     private JTextArea populationTextArea;
-    // stores the component that was last entered
-    // this aims to solve the problem where when the mouse is inside the populationTextArea it thinks it's exiting
-    // the burrowLabel when really it's still inside it, the happens because the populationTextArea is on a higher
-    // layer than the burrowLabel
-    private JLabel burrowEntered;
+
+    // stores the resource label being displayed when the labels are condensed
+    private JLabel selectedResourceLabel;
 
     // - - - M A P S - - - //
 
-    // holds every type of item and its quantity
-    private Map<String, Integer> items = new LinkedHashMap<String, Integer>();
+    // holds every type of resource and its quantity
+    private Map<String, Integer> resources = new LinkedHashMap<String, Integer>();
     // stores all the frogs and their display labels
     private Map<JLabel, Frog> frogs = new HashMap<JLabel, Frog>();
 
     // - - - L I S T S  &  A R R A Y S - - - //
 
     // stores all the display labels
-    private ArrayList<JLabel> displayLabels = new ArrayList<JLabel>();
+    private ArrayList<JLabel> resourceLabels = new ArrayList<JLabel>();
     // stores all the burrow images
     private final Burrow[] burrows = new Burrow[20];
 
@@ -112,21 +109,22 @@ public class Pond extends JFrame implements MouseListener {
         // creates each chunk of the background
         createBackground();
         // creates every type of item and sets its value
-        initializeItems();
-        // creates a display label for every kind of item and adds it to the frame
-        initializeItemDisplayLabels();
+        initializeResources();
+        // sets the frog stat as the selectedResourceLabel
+        initializeSelectedResourceLabel();
+        // displays all resource labels
+        expandResourceLabels();
         // create the time and time functions in the top right of the frame
         initializeTimeComponents();
-        // adds in the menu
-        addMenuButton();
-        // creates the menu
-        createMenu();
+        // adds in the menu bar at the top of the screen
+        addMenuBar();
         // starts the bubble animations in the water
         startBackgroundEffects();
         // spawns the 4 initial frogs
         spawnFrogs(4);
         // TODO: remove this once done testing
         addLilyPads();
+        // adds all the empty burrow in the ground
         addBurrows();
 
         // TODO: Remove this once done
@@ -144,54 +142,197 @@ public class Pond extends JFrame implements MouseListener {
     // - - - I T E M  M A N A G E M E N T - - - //
 
     // initializes each item and its quantity
-    public void initializeItems() {
+    public void initializeResources() {
         // number of frogs, tadpoles, eggs, bugs, plant food, and hours spent in total
-        items.put("Total Hours Spent", 0);
-        items.put("Frogs", 4);
-        items.put("Tadpoles", 0);
-        items.put("Eggs", 0);
-        items.put("Bugs", 0 /*TBD*/);
-        items.put("Plant Food", 0 /*TBD*/);
+        resources.put("Frogs", 4);
+        resources.put("Tadpoles", 0);
+        resources.put("Eggs", 0);
+        resources.put("Bugs", 0 /*TBD*/);
+        resources.put("Plant Food", 0 /*TBD*/);
+        resources.put("Total Hours Spent", 0);
     }
 
-    // creates a display label for each item and positions them accordingly in the frame
-    public void initializeItemDisplayLabels() {
-        int yPos = 0;
+    // sets the selectedResourceLabel to the frog stat
+    public void initializeSelectedResourceLabel() {
+        // adds the frog label
+        JLabel frogResourceLabel = new JLabel();
+        // adds the frame background
+        frogResourceLabel.setIcon(loadImage("Pictures/ClockFrame.png"));
+        frogResourceLabel.setFont(new Font("Serif", Font.PLAIN, 15));
+        frogResourceLabel.setText("Frogs: " + resources.get("Frogs"));
+        // moves the text to the correct x position
+        frogResourceLabel.setIconTextGap(-145);
+        frogResourceLabel.setVerticalTextPosition(SwingConstants.CENTER);
+        frogResourceLabel.setSize(150, 50);
+        frogResourceLabel.setLocation(0, 0);
 
-        // creates a display label for each item in the items map<String, Integer>
-        for (Map.Entry<String, Integer> entry : items.entrySet()) {
+        // adds the resourceLabel to the resourceLabels ArrayList
+        resourceLabels.add(frogResourceLabel);
+
+        // adds the resourceLabel to the layeredPane
+        layeredPane.add(frogResourceLabel, Integer.valueOf(1));
+    }
+
+    // displays all the resource labels with the selectedResourceLabel at the top and the condense label below
+    public void expandResourceLabels() {
+        // delete the expand label from the screen and the last index of the resourceLabels ArrayList
+        if (resourceLabels.size() > 1) {
+            // remove it from the screen
+            resourceLabels.get(1).setVisible(false);
+            layeredPane.remove(resourceLabels.get(1));
+            // removes it from the resourceLabels ArrayList
+            resourceLabels.removeLast();
+        }
+
+        int yPos = 50;
+
+        // add in all the other labels and the condense label at the last index
+        for (Map.Entry<String, Integer> entry : resources.entrySet()) {
             String name = entry.getKey();
             int quantity = entry.getValue();
 
-            // customizing the display label
-            JLabel displayLabel = new JLabel();
-            displayLabel.setFont(new Font("Serif", Font.PLAIN, 20));
-            displayLabel.setText(name + ": " + quantity);
-            displayLabel.setSize(displayLabel.getPreferredSize().width + 10, displayLabel.getPreferredSize().height);
-            displayLabel.setLocation(0, yPos);
+            // if the current resource is not already displayed on the selectedResourceLabel
+            if (!resourceLabels.getFirst().getText().contains(name)) {
 
-            // adds the displayLabel to the displayLabels ArrayList for future access
-            displayLabels.add(displayLabel);
+                // customizing the display label
+                JLabel resourceLabel = new JLabel();
+                resourceLabel.setName("ResourceLabel");
+                // adds the frame background
+                resourceLabel.setIcon(loadImage("Pictures/ResourceLabelFrame.png"));
+                resourceLabel.setFont(new Font("Serif", Font.PLAIN, 15));
+                resourceLabel.setText(name + ": " + quantity);
+                // moves the text to the correct x position
+                resourceLabel.setIconTextGap(-145);
+                resourceLabel.addMouseListener(this);
+                resourceLabel.setSize(150, 25);
+                resourceLabel.setLocation(0, yPos);
+                System.out.println("Display label size: " + resourceLabel.getSize());
 
-            // adds it to the layeredPane
-            layeredPane.add(displayLabel, Integer.valueOf(1));
+                // adds the resourceLabel to the resourceLabels ArrayList
+                resourceLabels.add(resourceLabel);
 
-            // moves the yPos down below the previous label
-            yPos += displayLabel.getHeight();
+                // adds the resourceLabel to the layeredPane
+                layeredPane.add(resourceLabel, Integer.valueOf(1));
+
+                // moves the yPos down below the previous label
+                yPos += 25;
+            }
+        }
+
+        // adds the condense label at the bottom of the stack
+        JLabel condenseLabel = new JLabel();
+        condenseLabel.setName("CondenseToggle");
+        condenseLabel.setIcon(loadImage("Pictures/CondenseToggle.png"));
+        condenseLabel.setSize(150, 25);
+        condenseLabel.setLocation(0, yPos);
+        condenseLabel.addMouseListener(this);
+        resourceLabels.add(condenseLabel);
+        layeredPane.add(condenseLabel, Integer.valueOf(1));
+
+    }
+
+    // displays only the selectedResourceLabel and the expand label below
+    public void condenseResourceLabels() {
+        // removes every resource label from the screen besides the selectedResourceLabel
+        for (int i = resourceLabels.size() - 1; i > 0; i--) {
+            // removes the label from the screen
+            resourceLabels.get(i).setVisible(false);
+            layeredPane.remove(resourceLabels.get(i));
+            // removes the label from the resourceLabels ArrayList
+            resourceLabels.removeLast();
+            // TODO: remove when done with testing
+            System.out.println(i);
+        }
+        System.out.println(resourceLabels.size());
+
+        // adds the expand label to the last index of the ArrayList below the selectedResourceLabel
+        JLabel expandLabel = new JLabel();
+        expandLabel.setName("ExpandToggle");
+        expandLabel.setIcon(loadImage("Pictures/ExpandToggle.png"));
+        expandLabel.setSize(150, 25);
+        expandLabel.setLocation(0, 50);
+        expandLabel.addMouseListener(this);
+        resourceLabels.add(expandLabel);
+        layeredPane.add(expandLabel, Integer.valueOf(1));
+    }
+
+
+    public void updateResourceLabels() {
+        // updates all resource labels actively being displayed
+        for (JLabel resourceLabel : resourceLabels) {
+            String text = resourceLabel.getName();
+            String resourceName = text.substring(0, text.indexOf(":"));
+
+            // resets the label
+            resourceLabel.setText(resourceName + ": " + resources.get(resourceName));
+            resourceLabel.setOpaque(true);
+            resourceLabel.setBackground(new Color(150,134,46));
         }
     }
 
-    // updates all resource display labels whenever necessary
-    public void updateDisplayLabels() {
-        // updates the text of all the display labels to match their actual quantities in the map
-        for (JLabel displayLabel : displayLabels) {
-            String text = displayLabel.getName();
-            String itemName = text.substring(0, text.indexOf(":"));
-
-            // resets the label
-            displayLabel.setText(itemName + ": " + items.get(itemName));
-            displayLabel.setSize(displayLabel.getPreferredSize());
+    public void printArr() {
+        System.out.print("{ ");
+        for (JLabel label : resourceLabels) {
+            System.out.print(label.getText() + " ");
         }
+        System.out.println(" }");
+    }
+
+    public void switchSelectedResourceLabel(JLabel newLabel) {
+        // saves the old selectedResourceLabel's text so it can be reinserted into index 1
+        String oldText = resourceLabels.getFirst().getText();
+
+        System.out.println(oldText);
+
+        printArr();
+
+        // sets the first label in the resourceLabels ArrayList to the new label's text
+        resourceLabels.getFirst().setText(newLabel.getText());
+
+        // removes the new label's old label in the array
+        for (int i = 1; i < resourceLabels.size(); i++) {
+            if (resourceLabels.get(i).getText().equals(newLabel.getText())) {
+                resourceLabels.get(i).setVisible(true);
+                layeredPane.remove(resourceLabels.get(i));
+                resourceLabels.remove(i);
+                break;
+            }
+        }
+
+        printArr();
+
+        // reinserts the old selectedResourceLabel into index 1
+        JLabel demotedResourceLabel = new JLabel();
+        demotedResourceLabel.setName("ResourceLabel");
+        // adds the frame background
+        demotedResourceLabel.setIcon(loadImage("Pictures/ResourceLabelFrame.png"));
+        demotedResourceLabel.setFont(new Font("Serif", Font.PLAIN, 15));
+        demotedResourceLabel.setText(oldText);
+        // moves the text to the correct x position
+        demotedResourceLabel.setIconTextGap(-145);
+        demotedResourceLabel.addMouseListener(this);
+        demotedResourceLabel.setSize(150, 25);
+        demotedResourceLabel.setLocation(0, 50);
+        resourceLabels.add(1, demotedResourceLabel);
+        System.out.println(resourceLabels.size());
+
+        layeredPane.add(demotedResourceLabel, Integer.valueOf(1));
+
+        printArr();
+
+        int yPos = 75;
+
+        for (int i = 2; i < resourceLabels.size(); i++) {
+            resourceLabels.get(i).setVisible(false);
+            resourceLabels.get(i).setLocation(0, yPos);
+            resourceLabels.get(i).setVisible(true);
+            System.out.println(i + ": " + resourceLabels.get(i).getLocation());
+            System.out.println(resourceLabels.get(i).getText());
+            yPos += 25;
+        }
+
+        printArr();
+
     }
 
 
@@ -205,42 +346,47 @@ public class Pond extends JFrame implements MouseListener {
         try {
             File fontFile = new File("Custom Fonts/digital_7/digital-7.ttf");
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
-            customFont = customFont.deriveFont(40f); // Set the desired font size
+            customFont = customFont.deriveFont(45f); // set the font size
 
             // use the custom font
-            timeLabel.setFont(customFont);
+            clock.setFont(customFont);
 
         }
         catch (FontFormatException | IOException e) {
             e.printStackTrace();
         }
-        // timeLabel.setFont(new Font("Dialog", Font.PLAIN, 30));
+        // clock.setFont(new Font("Dialog", Font.PLAIN, 30));
         // updates the text in the time label
         updateTime();
-        timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        timeLabel.setIcon(loadImage("Pictures/TimeFrame.png"));
-        timeLabel.setSize(width, timeLabel.getPreferredSize().height);
-        System.out.println("Clock Size: " + timeLabel.getSize());
-        timeLabel.setLocation(FRAME_WIDTH - width, 0);
+        clock.setHorizontalTextPosition(SwingConstants.CENTER);
+        clock.setIcon(loadImage("Pictures/ClockFrame.png"));
+        clock.setSize(150, 50);
+        clock.setLocation(550, 0);
         // adds it to the frame
-        layeredPane.add(timeLabel, Integer.valueOf(6));
+        layeredPane.add(clock, Integer.valueOf(6));
+        System.out.println("Clock Size: " + clock.getSize());
 
         // formats the bedtime label:
+        bedtimeLabel.setIcon(loadImage("Pictures/ResourceLabelFrame.png"));
         bedtimeLabel.setFont(new Font("Serif", Font.PLAIN, 15));
         bedtimeLabel.setText("Bedtime: " + bedtime + ":00pm");
-        bedtimeLabel.setSize(width, timeLabel.getPreferredSize().height);
-        bedtimeLabel.setLocation(FRAME_WIDTH - width, timeLabel.getY() + timeLabel.getHeight());
+        bedtimeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        bedtimeLabel.setSize(150, 25);
+        bedtimeLabel.setLocation(550, 50);
         // adds it to the frame
         layeredPane.add(bedtimeLabel, Integer.valueOf(6));
 
         // formats next day button:
+        nextDayButton.setIcon(loadImage("Pictures/NextDayFrame.png"));
         nextDayButton.setName("NextDayButton");
-        nextDayButton.setFont(new Font("Serif", Font.PLAIN, 20));
+        nextDayButton.setFont(new Font("Serif", Font.PLAIN, 15));
         nextDayButton.setText("Next Day");
+        nextDayButton.setIconTextGap(-95);
+        nextDayButton.setVerticalTextPosition(SwingConstants.CENTER);
         // moves to next day when clicked
         nextDayButton.addMouseListener(this);
-        nextDayButton.setSize(width, timeLabel.getPreferredSize().height);
-        nextDayButton.setLocation(FRAME_WIDTH - width, bedtimeLabel.getY() + bedtimeLabel.getHeight());
+        nextDayButton.setSize(100, 50);
+        nextDayButton.setLocation(600, 75);
         // adds it to the frame
         layeredPane.add(nextDayButton, Integer.valueOf(1));
     }
@@ -250,10 +396,10 @@ public class Pond extends JFrame implements MouseListener {
         // time == 12am or pm
         if (time == 12) {
             if (amOrPm.equals("am")) {
-                timeLabel.setText(time + ":00pm");
+                clock.setText(time + ":00pm");
             }
             else {
-                timeLabel.setText(time + ":00am");
+                clock.setText(time + ":00am");
             }
         }
         // time != 12am or pm
@@ -269,7 +415,7 @@ public class Pond extends JFrame implements MouseListener {
                     amOrPm = "am";
                 }
             }
-            timeLabel.setText(time + ":00" + amOrPm);
+            clock.setText("0" + time + ":00" + amOrPm);
         }
     }
 
@@ -300,7 +446,7 @@ public class Pond extends JFrame implements MouseListener {
         layeredPane.add(ground, Integer.valueOf(0));
 
         // adds rocks to the background
-        JLabel rocks = new JLabel(loadImage("Pictures/Rockbed1.png"));
+        JLabel rocks = new JLabel(loadImage("Pictures/RockBed1.png"));
         rocks.setSize(rocks.getPreferredSize());
         rocks.setLocation(0, 360);
         layeredPane.add(rocks, Integer.valueOf(1));
@@ -423,7 +569,7 @@ public class Pond extends JFrame implements MouseListener {
         int yPos = (burrowHeight - populationTextArea.getHeight()) / 2 + burrowY;
 
         populationTextArea.setLocation(xPos, yPos);
-        layeredPane.add(populationTextArea, Integer.valueOf(10));
+        layeredPane.add(populationTextArea, Integer.valueOf(2));
     }
 
     // - - - A N I M A T I O N - - - //
@@ -483,30 +629,27 @@ public class Pond extends JFrame implements MouseListener {
 
     // - - - M E N U  M E T H O D S - - - //
 
-    public void addMenuButton() {
-        menuButton.setText("Action Menu");
-        menuButton.setFont(new Font("Serif", Font.PLAIN, 20));
-        menuButton.setSize(146, 42);
-        menuButton.setIcon(loadImage("Pictures/MenuButtonBackground.png"));
-        System.out.println("Menu Button: " + menuButton.getSize());
-        menuButton.setHorizontalTextPosition(SwingConstants.CENTER);
-        menuButton.setLocation(350 - menuButton.getWidth() / 2, 0);
-        menuButton.addMouseListener(this);
-        menuButton.setName("MenuButton");
-        layeredPane.add(menuButton, Integer.valueOf(6));
-    }
+    public void addMenuBar() {
+        // 8 40x40 inventory slots at the top of the screen
 
-    public void createMenu() {
-        menu.setSize(700, 700);
-        menu.setLayout(null);
-        JLabel menuBackground = new JLabel();
-        menuBackground.setSize(700, 700);
-        menuBackground.setIcon(loadImage("Pictures/MenuBackground.png"));
-        menu.add(menuBackground);
-        menu.setVisible(false);
-        layeredPane.add(menu, Integer.valueOf(5));
-        menu.revalidate();
-        System.out.println(menuBackground.getLocation());
+        menuBar.setLayout(null);
+        menuBar.setIcon(loadImage("Pictures/MenuBarFrame.png"));
+        menuBar.setSize(400, 50);
+        menuBar.setLocation(150, 0);
+
+        // adding in the individual 8 slots
+        for (int i = 0; i < 5; i++) {
+            JLabel barSlot = new JLabel();
+            barSlot.setIcon(loadImage("Pictures/itemFrame.png"));
+            barSlot.setOpaque(true);
+            barSlot.setSize(50, 50);
+            barSlot.setLocation((i + 1) * 25 + i * 50, 0);
+            menuBar.add(barSlot);
+        }
+
+        layeredPane.add(menuBar, Integer.valueOf(1));
+
+        System.out.println("Menu bar size: " + menuBar.getSize());
     }
 
     // - - - M I S C E L L A N E O U S - - - //
@@ -571,32 +714,39 @@ public class Pond extends JFrame implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
         // gets the component pressed
         Object object = e.getSource();
 
         // if the object is a JLabel
-        if (object instanceof JLabel temp) {
+        if (object instanceof JLabel label) {
             // if the JLabel being entered has a name
             // (all JLabels with mouseListeners added should be named)
-            if (temp.getName() != null) {
-                String name = temp.getName();
+            if (label.getName() != null) {
+                String name = label.getName();
 
                 // if clicking the next day
                 if (name.equals("NextDayButton")) {
                     // TODO: go to next day
                 }
-                else if (name.equals("MenuButton")) {
-                    // opens and closes the menu
-                    menu.setVisible(!menu.isVisible());
+                // if clicking the condense label
+                else if (name.equals("CondenseToggle")) {
+                    condenseResourceLabels();
                 }
-
+                // if clicking the expand label
+                else if (name.equals("ExpandToggle")) {
+                    expandResourceLabels();
+                }
+                // if clicking on a resource label
+                else if (name.equals("ResourceLabel")) {
+                    switchSelectedResourceLabel(label);
+                }
             }
         }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
     }
 
     @Override
@@ -617,7 +767,7 @@ public class Pond extends JFrame implements MouseListener {
                 String name = label.getName();
 
                 // if it's a background label it highlights the border
-                if (name.equals("MenuButton") || name.equals("NextDayButton")) {
+                if (name.contains("Button") || name.contains("Toggle") || name.equals("ResourceLabel")) {
                     label.setBorder(new LineBorder(Color.YELLOW, 1));
                 }
                 // displays frog's name
@@ -629,7 +779,6 @@ public class Pond extends JFrame implements MouseListener {
                     System.out.println(label.getLocation());
                     System.out.println(name);
                     displayBurrowPopulation(label, name);
-                    burrowEntered = label;
                 }
             }
         }
@@ -647,7 +796,7 @@ public class Pond extends JFrame implements MouseListener {
                 String name = label.getName();
 
                 // if label is a background label it removes the highlighting border
-                if (name.equals("MenuButton") || name.equals("NextDayButton")) {
+                if (name.contains("Button") || name.contains("Toggle") || name.equals("ResourceLabel")) {
                     label.setBorder(null);
                 }
                 // if label is a frog label it removes the name above its head
