@@ -1,3 +1,9 @@
+/*
+    Finley Meadows & Michael Anderson
+    12/7/2024
+    The SwimMovementHandler class calculates the movement for each frog and tadpole swimming in the pond
+*/
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,10 +48,12 @@ public class SwimMovementHandler {
         if (((int) (Math.random() * 2)) == 1) {
             movementDirections[1] *= -1;
         }
+
+        createSwimTimer();
     }
 
-    // this method must be run after the frog is added to the water
-    public void moveFrog() {
+
+    public void createSwimTimer() {
         // Frame 1: no change
         // Frame 2: x change of xVelocities[0] pixels & y change of 1 pixel
         // Frame 3: x change of xVelocities[1] pixels & possible y change of 1 pixels
@@ -116,7 +124,6 @@ public class SwimMovementHandler {
                 }
             }
         });
-        movementTimer.start();
     }
 
     public void switchFrame() {
@@ -279,5 +286,13 @@ public class SwimMovementHandler {
     private boolean inBounds() {
         return xPos >= 0 && yPos >= 203 && xPos + frog.getLabelWidth() <= Pond.FRAME_WIDTH &&
                 yPos + frog.getLabelHeight() <= 510;
+    }
+
+    public void startSwimTimer() {
+        movementTimer.start();
+    }
+
+    public void stopSwimTimer() {
+        movementTimer.stop();
     }
 }

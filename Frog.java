@@ -1,3 +1,9 @@
+/*
+    Finley Meadows & Michael Anderson
+    12/4/2024
+    The Frog class runs all the back end calculations for each frog added to the screen
+*/
+
 import javax.swing.*;
 
 public class Frog {
@@ -46,13 +52,6 @@ public class Frog {
         return names[(int) (Math.random() * names.length)];
     }
 
-    public void startSwimming() {
-        swimPos.moveFrog();
-    }
-
-    public void stopSwimming() {
-    }
-
     private void randomizeCoords() {
         int x = (int) (Math.random() * (Pond.FRAME_WIDTH - displayLabel.getWidth()));
         int y = (int) (Math.random() * (307 - displayLabel.getHeight())) + 203;
@@ -95,6 +94,14 @@ public class Frog {
     // moves frog to the next stage
     public void growFrog() {
         currentStage++;
+    }
+
+    public void startSwimming() {
+        swimPos.startSwimTimer();
+    }
+
+    public void stopSwimming() {
+        swimPos.startSwimTimer();
     }
 
     public JLabel getDisplayLabel() {

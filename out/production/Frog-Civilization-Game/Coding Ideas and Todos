@@ -50,6 +50,13 @@ Water cleanliness could give the frogs a percentage of death, as the days pass, 
 Upgrades/Tools: 
 
 Tools and Upgrades will occasionally pop up in any players game. any tool can have a starting percentage like 0.5% that it will be given to the play as they pass time. As the player does different actions it could slightly increase the chances of acquring one of these items. for example, the chance of gaining the bug net increases by 1% everytime the player does the action to catch bugs.  
+Percentages%%%% of tools:
+Golden Bug Net: Starts at a 1% chance. As each day passes, this number should increase by 1%. Each time the player does the collect bugs action, it increases this percentage by 0.5% or 1%.
+- This changes the amount of bugs caught each time from 1 - 30 to 5 - 45.
+Golden Fertilizer: Starts at a 1% chance. As each day passes, this number should increase by 1%. Each time the player does the grow plant food action, it increases this percentage by 0.5% or 1%.
+- This changes the amount of plant food gained each time from 1 - 30 to 5 - 45.
+Golden Hammer: This should start at 5%. Each time a burrow is filled with 5 frogs, this percentage will increase by 2% <-- CHANGE THIS NOW CAUSE ITS BAD -----=-------=--=-=-=
+Water Filter:
 
 
 

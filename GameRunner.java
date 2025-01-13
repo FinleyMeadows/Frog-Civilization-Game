@@ -1,7 +1,7 @@
 /*
     Finley Meadows & Michael Anderson
     12/2/2024
-    GameRunner will call the Pond class constructor and run the game
+    The GameRunner class calls the Pond class constructor runs the game
 */
 
 /*

@@ -1,3 +1,10 @@
+/*
+    Finley Meadows & Michael Anderson
+    12/6/2025
+    The Burrow class controls the positioning of frogs within the burrows and
+    each burrows visual vs true capacity (3 on screen at a time / 5 total per burrow)
+*/
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
