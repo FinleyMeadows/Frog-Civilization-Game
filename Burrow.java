@@ -18,8 +18,10 @@ public class Burrow {
     // stores the number of frogs in the burrow out of 5
     private int numFrogs = 0;
 
-    public Burrow(ImageIcon image) {
-        this.image = image;
+    private JLabel displayLabel;
+
+    public Burrow(JLabel displayLabel) {
+        this.displayLabel = displayLabel;
     }
 
 
@@ -50,8 +52,8 @@ public class Burrow {
         }
     }
 
-    public ImageIcon getImage() {
-        return image;
+    public JLabel getDisplayLabel() {
+        return displayLabel;
     }
 
     public int getNumFrogs() {

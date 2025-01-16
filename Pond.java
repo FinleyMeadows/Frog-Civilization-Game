@@ -36,6 +36,9 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
     // stores the initial location of the item in the menu bar
     private Point initialItemLocation;
 
+    // tracks when the mouse is being pressed to suppress unwanted interactions
+    private boolean mouseIsPressed;
+
 
     // - - - C O M P O N E N T S - - - //
 
@@ -86,13 +89,13 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
     private Map<String, Integer> resources = new LinkedHashMap<String, Integer>();
     // stores all the frogs and their display labels
     private Map<JLabel, Frog> frogs = new HashMap<JLabel, Frog>();
+    // stores all the burrows on screen <burrowName, Burrow>
+    private Map<String, Burrow> burrows = new HashMap<String, Burrow>();
 
     // - - - L I S T S  &  A R R A Y S - - - //
 
     // stores all the display labels
     private ArrayList<JLabel> resourceLabels = new ArrayList<JLabel>();
-    // stores all the burrow images
-    private final Burrow[] burrows = new Burrow[20];
     // holds all the item in the player's inventory
     private ArrayList<JLabel> items = new ArrayList<JLabel>();
 
@@ -348,8 +351,6 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
     // - - - T I M E  M A N A G E M E N T - - - //
 
     public void initializeTimeComponents() {
-        int width = 110;
-
         // formats the time label:
         // attempts to use a custom clock font for the time
         try {
@@ -467,36 +468,21 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
 
         // spawns 20 lily pads across the surface of the water
         for (int i = 0; i < 20; i++) {
-            randPad = (int) (Math.random() * 4);
+            randPad = (int) (Math.random() * 2);
 
             JLabel lilyPad = new JLabel();
 
             // picks a lily pad at random
-            switch (randPad) {
-                case 0:
-                    lilyPad.setIcon(loadImage("Pictures/LilyPadWithLotusAndStem1.png"));
-                    break;
-
-                case 1:
-                    lilyPad.setIcon(loadImage("Pictures/LilyPadWithLotusAndStem2.png"));
-                    break;
-
-                case 2:
-                    lilyPad.setIcon(loadImage("Pictures/LilyPadWithStem1.png"));
-                    break;
-
-                case 3:
-                    lilyPad.setIcon(loadImage("Pictures/LilyPadWithStem2.png"));
-                    break;
-
-                default:
-                    System.out.println("You messed the randomization up");
-                    break;
+            if (randPad == 1) {
+                lilyPad.setIcon(loadImage("Pictures/LilyPadWithLotus.png"));
+            }
+            else {
+                lilyPad.setIcon(loadImage("Pictures/LilyPad.png"));
             }
 
             lilyPad.setSize(lilyPad.getPreferredSize());
             // evenly spaces out each lily pad across 700 pixels
-            lilyPad.setLocation(i * 30 + i * 7, 203 - lilyPad.getHeight() + 307);
+            lilyPad.setLocation(i * 30 + i * 2, 203 - lilyPad.getHeight() + 1);
             layeredPane.add(lilyPad, Integer.valueOf(2));
         }
     }
@@ -507,12 +493,11 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             int bubbleChance = (int) (Math.random() * 15) + 1;
             if (bubbleChance == 15) {
                 int bubbleX = (int) (Math.random() * 668);
-                // plays the bubble animations
-                spawnBubbles(bubbleX);
-                /*
-                    playAnimation(loadImage("Animations/BubbleGif.gif"), bubbleX,
-                            200, 32, 300, 3375);
-                */
+
+                // plays the bubble animation
+                playAnimation(loadImage("Animations/BubbleGif.gif"), bubbleX,
+                        200, 32, 300, 3375);
+
             }
         });
         backgroundEffectsTimer.start();
@@ -522,32 +507,28 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         // 680 x 170
         // 59 x 80
 
-        // sets size equal to the dimensions of the ground
-        burrowPanel.setSize(ground.getWidth() - 20, ground.getHeight() - 20);
-        // sets location equal to the location of the ground
-        burrowPanel.setLocation(ground.getX() + 10, ground.getY() + 10);
-        // creates a 2x10 grid layout with 5pixel horizontal and vertical gaps
-        burrowPanel.setLayout(new GridLayout(2, 10, 10, 10));
-        // makes the background transparent
-        burrowPanel.setOpaque(false);
+        for (int r = 1; r <= 2; r++) {
+            for (int c = 1; c <= 10; c++) {
+                // creates a label to hold the burrow
+                JLabel burrowLabel = new JLabel();
+                burrowLabel.setSize(59, 80);
+                // gets a random empty burrow image 1-5
+                burrowLabel.setIcon(loadImage("Pictures/EmptyBurrow" + ((int) (Math.random() * 5) + 1) + ".png"));
+                burrowLabel.addMouseListener(this);
+                // name = EmptyBurrow [1-20]
+                burrowLabel.setName("EmptyBurrow" + (c + (r - 1) * 10));
+                // loc = cumulative h-gap + burrow widths, ground start loc + cumulative v-gap + burrow heights
+                burrowLabel.setLocation((10 * c) + ((c - 1) * 59), 510 + (10 * r) + (r - 1) * 80);
+                System.out.println(burrowLabel.getLocation());
 
-        // creates all the empty burrows and adds them to the screen
-        for (int i = 0; i < burrows.length; i++) {
-            // picks a random empty burrow image
-            Burrow burrow = new Burrow(loadImage("Pictures/EmptyBurrow" + ((int) (Math.random() * 5) + 1) + ".png"));
-            // assigns a couple locations for frogs to rest in each one of the burrows
-            setBurrowPositions();
+                Burrow burrow = new Burrow(burrowLabel);
+                // assigns a couple locations for frogs to rest in each one of the burrows
+                setBurrowPositions();
 
-            // creates a label to hold the burrow
-            JLabel burrowLabel = new JLabel();
-            burrowLabel.setSize(59, 80);
-            burrowLabel.setIcon(burrow.getImage());
-            burrowLabel.addMouseListener(this);
-            burrowLabel.setName("Burrow" + i);
-            System.out.println(burrowLabel.getName());
-
-            burrows[i] = burrow;
-            burrowPanel.add(burrowLabel);
+                // adds the burrow to the map
+                burrows.put(burrowLabel.getName(), burrow);
+                layeredPane.add(burrowLabel, Integer.valueOf(1));
+            }
         }
 
         layeredPane.add(burrowPanel, Integer.valueOf(1));
@@ -559,17 +540,14 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
 
     public void displayBurrowPopulation(JLabel label, String name) {
         // +20 pixels to account for the offset of the burrowPanel x
-        int burrowX = label.getX() + 10;
+        int burrowX = label.getX();
         // +530 pixels to account for the offset of the burrowPanel y
-        int burrowY = label.getY() + 520;
+        int burrowY = label.getY();
         // dimensions of the burrow
         int burrowWidth = label.getWidth();
         int burrowHeight = label.getHeight();
-        // the number of the burrow [0-19]
-        int burrowNum = Integer.parseInt(name.substring(name.indexOf("w") + 1));
-        System.out.println(burrowNum);
-        Burrow burrow = burrows[burrowNum];
-        System.out.println(burrowNum);
+        // stores the burrow
+        Burrow burrow = burrows.get(name);
 
         // creates a label to display the population of the burrow
         populationTextArea = new JTextArea(" " + burrow.getNumFrogs() + " \n---\n 5 ") {
@@ -593,39 +571,12 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         int yPos = (burrowHeight - populationTextArea.getHeight()) / 2 + burrowY;
 
         populationTextArea.setLocation(xPos, yPos);
-        layeredPane.add(populationTextArea, Integer.valueOf(2));
+        layeredPane.add(populationTextArea, Integer.valueOf(3));
     }
 
     // - - - A N I M A T I O N - - - //
 
-    private void spawnBubbles(int randX) {
-        ImageIcon bubbles = loadImage("Animations/BubbleGif.gif");
 
-        // does a weird work-around to reset the gif each time a new one is created
-        Image rerenderedImage = bubbles.getImage().getScaledInstance(32, 300, Image.SCALE_REPLICATE);
-        JLabel bubbleAnimation = new JLabel(new ImageIcon(rerenderedImage));
-        bubbleAnimation.setSize(32, 300);
-        // spawns somewhere on the pond floor so y stays constant
-        bubbleAnimation.setLocation(randX, 200);
-        // bubble spawns somewhere random on the z-axis between layers [1-4]
-        layeredPane.add(bubbleAnimation, Integer.valueOf((int) (Math.random() * 4) + 1));
-
-        // creates a timer to control the animation's duration
-        Timer animationTimer = new Timer(3375, e -> {
-            // stop the animation and clean up
-            bubbleAnimation.setVisible(false);
-            layeredPane.remove(bubbleAnimation);
-            layeredPane.revalidate();
-            layeredPane.repaint();
-        });
-
-        // ensure the timer runs only once
-        animationTimer.setRepeats(false);
-        animationTimer.start();
-    }
-
-    // TODO: IDK if I actually need this method because the only thing animated rn is the bubbles and
-    //  this method was designed for general use, not specialized
     private void playAnimation(ImageIcon gif, int x, int y, int width, int height, int duration) {
         // does a weird work-around to reset the gif each time a new one is created
         Image rerenderedImage = gif.getImage().getScaledInstance(width, height, Image.SCALE_REPLICATE);
@@ -642,8 +593,6 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             // stop the animation and clean up
             animation.setVisible(false);
             layeredPane.remove(animation);
-            layeredPane.revalidate();
-            layeredPane.repaint();
         });
 
         // ensure the timer runs only once
@@ -683,11 +632,11 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
     // - - - I T E M  &  A C T I O N  M E T H O D S - - - //
 
     public void createItems() {
-        createItem("BugNet", "Pictures/BugNet.png");
-        createItem("Hammer", "Pictures/Hammer2.png");
-        createItem("PlantFood", "Pictures/PlantFood.png");
+        createItem("BugNetItem", "Pictures/BugNet.png");
+        createItem("HammerItem", "Pictures/Hammer2.png");
+        createItem("PlantFoodItem", "Pictures/PlantFood.png");
         for (int i = 0; i < 2; i++) {
-            createItem("LilyPadSeed", "Pictures/LilyPadSeed2.png");
+            createItem("LilyPadSeedItem", "Pictures/LilyPadSeed2.png");
         }
         // TODO: create all the other items
     }
@@ -719,7 +668,7 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         itemDescription.setLocation(itemDescriptionBackground.getLocation());
         itemDescription.setSize(50, 25);
 
-        if (item.getName().equals("BugNet")) {
+        if (item.getName().equals("BugNetItem")) {
             itemDescription.setText("Collect Bugs:\nCost: 1 Hour");
         }
 
@@ -746,9 +695,89 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         spendTime(3);
     }
 
-    public void buildBurrow() {
+    public void buildBurrow(Burrow burrow) {
         // takes 5 hours
         spendTime(5);
+
+        JLabel burrowLabel = burrow.getDisplayLabel();
+
+        String burrowName = burrowLabel.getName();
+
+        // deletes the old name in the map of burrows
+        burrows.remove(burrowName);
+
+        // renames the burrow so it can't be built upon further
+        burrow.getDisplayLabel().setName("Burrow" + burrowName.substring(burrowName.indexOf("w") + 1));
+
+        // adds in the new name to the map of burrows
+        burrows.put(burrow.getDisplayLabel().getName(), burrow);
+
+        // does a weird work-around to reset the gif each time a new one is created
+        ImageIcon gif = loadImage("Animations/HammerAnimation.gif");
+        Image rerenderedImage = gif.getImage().getScaledInstance(50, 50, Image.SCALE_REPLICATE);
+        JLabel animation = new JLabel(new ImageIcon(rerenderedImage));
+
+        animation.setSize(50, 50);
+        animation.setLocation(burrowLabel.getX() + 4, burrowLabel.getY() + 15);
+
+        // add the animation to the layeredPane
+        layeredPane.add(animation, Integer.valueOf(4));
+
+        Timer halfBuiltTimer = new Timer(333, e -> {
+            burrow.getDisplayLabel().setIcon(loadImage("Pictures/HalfBuiltBurrow.png"));
+        });
+
+        halfBuiltTimer.setRepeats(false);
+        halfBuiltTimer.start();
+
+        Timer fullBuiltTimer = new Timer(916, e -> {
+
+            // picks between burrows [1-8]
+            int randBurrowNum = (int) (Math.random() * 8) + 1;
+            // assigns the burrow a random built burrow image
+            burrow.getDisplayLabel().setIcon(loadImage("Pictures/Burrow" + randBurrowNum + ".png"));
+        });
+
+        fullBuiltTimer.setRepeats(false);
+        fullBuiltTimer.start();
+
+
+
+        // creates a timer to control the animation's duration
+        Timer hammerTimer = new Timer(1333, e -> {
+            // stop the animation and clean up
+            animation.setVisible(false);
+            layeredPane.remove(animation);
+        });
+
+        // ensure the timer runs only once
+        hammerTimer.setRepeats(false);
+        hammerTimer.start();
+
+        // automatically assigns available frogs to the new burrow
+        assignFrogsToBurrow(burrow);
+    }
+
+    public void assignFrogsToBurrow(Burrow burrow) {
+        int numFrogsAssigned = burrow.getNumFrogs();
+
+        // finds all frogs without a burrow and assigns a max of 5 of them to the new burrow
+        for (Map.Entry<JLabel, Frog> entry : frogs.entrySet()) {
+            Frog frog = entry.getValue();
+
+            // if the frog does not have a burrow it gets added to the new burrow
+            if (!frog.hasBurrow() && numFrogsAssigned < 5) {
+                // adds the frog to the burrow
+                burrow.addFrogs(1);
+                // changes the frogs burrow status so it cannot be assigned again
+                frog.setHasBurrow(true);
+
+                numFrogsAssigned++;
+                if (numFrogsAssigned == 5) {
+                    break;
+                }
+            }
+        }
     }
 
     public void addPlantFood() {
@@ -814,11 +843,15 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         layeredPane.add(frogNameLabel, Integer.valueOf(4));
 
         // keeps the position of the frogNameLabel synced with the position of the frog label
-        namePosUpdater = new Timer(1, e1 -> {
+        namePosUpdater = new Timer(1, e -> {
             int newXPos = frogLabel.getX() + (frogLabel.getWidth() - frogNameLabel.getWidth()) / 2;
             frogNameLabel.setLocation(newXPos, frogLabel.getY() - frogNameLabel.getHeight());
         });
         namePosUpdater.start();
+    }
+
+    public boolean enoughTime(int additiveHours) {
+        return true; // TODO: figure this shit out, I'm too tired rn
     }
 
     // - - - M O U S E L I S T E N E R  M E T H O D S - - - //
@@ -857,6 +890,8 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        mouseIsPressed = true;
+
         Object object = e.getSource();
 
         // if the object is JLabel
@@ -865,9 +900,21 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             if (label.getName() != null) {
                 String name = label.getName();
 
-                if (name.equals("BugNet")) {
-                    // returns the net back to its unselected ImageIcon
-                    label.setIcon(loadImage("Pictures/BugNet.png"));
+                if (name.contains("Item")) {
+                    switch (name) {
+                        case "BugNetItem" ->
+                            // returns the net back to its unselected ImageIcon
+                                label.setIcon(loadImage("Pictures/BugNet.png"));
+                        case "HammerItem" ->
+                            // returns the hammer back to its unselected ImageIcon
+                                label.setIcon(loadImage("Pictures/Hammer2.png"));
+                        case "PlantFoodItem" ->
+                            // returns the hammer back to its unselected ImageIcon
+                                label.setIcon(loadImage("Pictures/PlantFood.png"));
+                        case "LilyPadSeedItem" ->
+                            // returns the plant food back to its unselected ImageIcon
+                                label.setIcon(loadImage("Pictures/LilyPadSeed2.png"));
+                    }
                     // closes the description of the item
                     closeItemDescription();
                     // marks the beginning of the mouse drag
@@ -881,6 +928,8 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        mouseIsPressed = false;
+
         Object object = e.getSource();
 
         // if the object is JLabel
@@ -889,17 +938,32 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             if (label.getName() != null) {
                 String name = label.getName();
 
-                if (name.equals("BugNet")) {
-                    Point releaseLocation = label.getLocation();
+                if (name.contains("Item")) {
+                    Point releaseLocation = getMousePosition();
 
                     // make label invisible while animation is playing
                     label.setVisible(false);
                     layeredPane.remove(label);
 
-                    System.out.println(layeredPane.getComponentAt(releaseLocation).getName());
-                    // collect bugs at the release location if within the bounds exposed sky
-                    if (sky.contains(releaseLocation) && layeredPane.getComponentAt(releaseLocation).equals(sky)) {
-                        collectBugs();
+                    // saves the name of the component
+                    String componentName = layeredPane.getComponentAt(releaseLocation).getName();
+                    System.out.println(layeredPane.getComponentAt(releaseLocation).getClass());
+
+                    System.out.println(releaseLocation);
+                    System.out.println(componentName);
+
+                    if (componentName != null) {
+                        // collect bugs at the release location if within the bounds exposed sky
+                        if (sky.contains(releaseLocation) && componentName.equals("Sky") && name.equals("BugNetItem")) {
+                            collectBugs();
+                            System.out.println("Collecting Bugs...");
+                        }
+                        // if releasing on a burrow
+                        else if (componentName.contains("EmptyBurrow") &&
+                                name.equals("HammerItem")) {
+                            System.out.println("Hammering...");
+                            buildBurrow(burrows.get(componentName));
+                        }
                     }
 
                     // return item back to its slot in the menu bar
@@ -916,8 +980,8 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         // gets the component pressed
         Object object = e.getSource();
 
-        // if the object is a JLabel
-        if (object instanceof JLabel label) {
+        // if the object is a JLabel and the mouse is not actively being pressed
+        if (object instanceof JLabel label && !mouseIsPressed) {
             // if the JLabel being entered has a name
             // (all JLabels with mouseListeners added should be named)
             if (label.getName() != null) {
@@ -937,10 +1001,27 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
                     System.out.println(name);
                     displayBurrowPopulation(label, name);
                 }
-                // if entering the net item label and the item isn't being dragged
-                else if (name.equals("BugNet") && label.getY() == 0) {
-                    // highlights the border around the actual item
-                    label.setIcon(loadImage("Pictures/SelectedNet.png"));
+                else if (name.contains("Item")) {
+                    // if entering the net item label and the item isn't being dragged
+                    if (name.equals("BugNetItem") && label.getY() == 0) {
+                        // highlights the border around the actual item
+                        label.setIcon(loadImage("Pictures/SelectedNet.png"));
+                    }
+                    // if entering the hammer item label and the item isn't being dragged
+                    else if (name.equals("HammerItem") && label.getY() == 0) {
+                        // highlights the border around the actual item
+                        label.setIcon(loadImage("Pictures/SelectedHammer.png"));
+                    }
+                    // if entering the plant food item label and the item isn't being dragged
+                    else if (name.equals("PlantFoodItem") && label.getY() == 0) {
+                        // highlights the border around the actual item
+                        label.setIcon(loadImage("Pictures/SelectedPlantFood.png"));
+                    }
+                    // if entering the lily pad seed item label and the item isn't being dragged
+                    else if (name.equals("LilyPadSeedItem") && label.getY() == 0) {
+                        // highlights the border around the actual item
+                        label.setIcon(loadImage("Pictures/SelectedLilyPadSeed.png"));
+                    }
                     // displays the description of the item
                     openItemDescription(label);
                 }
@@ -953,8 +1034,8 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         // gets the component pressed
         Object object = e.getSource();
 
-        // if the object is a JLabel
-        if (object instanceof JLabel label) {
+        // if the object is a JLabel and the mouse isn't being pressed
+        if (object instanceof JLabel label && !mouseIsPressed) {
 
             if (label.getName() != null) {
                 String name = label.getName();
@@ -976,10 +1057,28 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
                     layeredPane.remove(populationTextArea);
                     System.out.println("Exited Burrow");
                 }
-                // if exiting the net item label
-                else if (name.equals("BugNet")) {
-                    // highlights the border around the actual item
-                    label.setIcon(loadImage("Pictures/BugNet.png"));
+                else if (name.contains("Item")) {
+                    // if exiting the net item label
+                    switch (name) {
+                        case "BugNetItem" ->
+                            // highlights the border around the actual item
+                                label.setIcon(loadImage("Pictures/BugNet.png"));
+
+                        // if exiting the hammer item label
+                        case "HammerItem" ->
+                            // highlights the border around the actual item
+                                label.setIcon(loadImage("Pictures/Hammer2.png"));
+
+                        // if exiting the plant food item label
+                        case "PlantFoodItem" ->
+                            // highlights the border around the actual item
+                                label.setIcon(loadImage("Pictures/PlantFood.png"));
+
+                        // if exiting the lily pad seed item label
+                        case "LilyPadSeedItem" ->
+                            // highlights the border around the actual item
+                                label.setIcon(loadImage("Pictures/LilyPadSeed2.png"));
+                    }
                     // closes the item's description
                     closeItemDescription();
                 }
@@ -999,7 +1098,8 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             if (label.getName() != null) {
                 String name = label.getName();
 
-                if (name.equals("BugNet") && getMousePosition() != null) {
+                // if the label is any of the items the position gets updated
+                if (name.contains("Item") && getMousePosition() != null) {
                     // calculates the change is mouse position
                     int changeInX = (int) (getMousePosition().getX() - mousePos.getX());
                     int changeInY = (int) (getMousePosition().getY() - mousePos.getY());

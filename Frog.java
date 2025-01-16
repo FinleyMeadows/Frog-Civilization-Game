@@ -131,4 +131,12 @@ public class Frog {
     public String getName() {
         return name;
     }
+
+    public boolean hasBurrow() {
+        return hasBurrow;
+    }
+
+    public void setHasBurrow(boolean hasBurrow) {
+        this.hasBurrow = hasBurrow;
+    }
 }
