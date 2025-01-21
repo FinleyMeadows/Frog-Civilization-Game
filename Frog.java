@@ -9,7 +9,7 @@ import javax.swing.*;
 public class Frog {
 
     // stages of a frog's life cycle
-    private final String[] stages = {"Egg", "Tadpole", "Frog"};
+    private final String[] stages = {"Tadpole", "Frog"};
     // holds the current stage of the frog
     private int currentStage;
     // the name of the frog
@@ -26,7 +26,7 @@ public class Frog {
     private SwimMovementHandler swimPos;
 
     public Frog() {
-        // starts as an egg (stage 0)
+        // starts as a tadpole (stage 0)
         this.currentStage = 0;
         // hasn't eaten anything yet
         this.algaeEaten = 0;
@@ -62,16 +62,12 @@ public class Frog {
         double survivalRate;
         int randNum = (int) (Math.random() * 100) + 1;
 
-        // egg
+        // tadpole 70% max
         if (currentStage == 0) {
-            // TODO: find a good survival rate for eggs
-            survivalRate = 2; // %
-        }
-        // tadpole
-        else if (currentStage == 1) {
-            // TODO: find out what factors determine a tadpole's survival rate
-            survivalRate = 1;
-            survivalRate += 33 * algaeEaten;
+            survivalRate = 0;
+            survivalRate += 10 * algaeEaten;
+            // based on water cleanliness
+            survivalRate += 50 - Pond.waterDirtiness / 2.0;
         }
         // frog
         else {
@@ -80,7 +76,7 @@ public class Frog {
             // 10% for each bug eaten (max of 3 bugs)
             survivalRate += 10 * bugsEaten;
             // water cleanliness, max of an additional 25%
-            survivalRate += 25 - 0.25 * (100 - Pond.waterCleanliness);
+            survivalRate += 25 - 0.25 * (Pond.waterDirtiness);
             // if the frog has a burrow it adds 30%
             if (hasBurrow) {
                 survivalRate += 30;
@@ -91,9 +87,41 @@ public class Frog {
         return randNum <= survivalRate;
     }
 
+    public void goToNextDay() {
+        boolean frogIsAlive = this.isAlive();
+
+        // if the tadpole lives
+        if (frogIsAlive && currentStage == 0) {
+            // reset the food eaten throughout the day
+            algaeEaten = 0;
+
+            // 50-50 for the tadpole to grow
+            if ((int) (Math.random() * 2) == 1) {
+                this.grow();
+                currentStage = 1;
+            }
+        }
+        // if the frog lives
+        else if (frogIsAlive && currentStage == 1) {
+            // reset the food eaten throughout the day
+            bugsEaten = 0;
+
+        }
+        // if the frog dies
+        else {
+            // declares the frog dead
+            currentStage = -1;
+        }
+    }
+
     // moves frog to the next stage
-    public void growFrog() {
-        currentStage++;
+    public void grow() {
+        if (currentStage < 2) {
+            currentStage++;
+        }
+        else {
+            System.out.println(name + " is fully grown");
+        }
     }
 
     public void startSwimming() {
@@ -101,6 +129,7 @@ public class Frog {
     }
 
     public void stopSwimming() {
+        displayLabel.setIcon(new ImageIcon("Animations/IdleFrog.gif"));
         swimPos.startSwimTimer();
     }
 
