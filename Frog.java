@@ -70,7 +70,7 @@ public class Frog {
             survivalRate = 0;
             survivalRate += 10 * algaeEaten;
             // based on water cleanliness
-            survivalRate += 50 - Pond.waterDirtiness / 2.0;
+            survivalRate += 50 - GameRunner.pond.getWaterDirtiness() / 2.0;
         }
         // frog
         else {
@@ -79,7 +79,7 @@ public class Frog {
             // 10% for each bug eaten (max of 3 bugs)
             survivalRate += 10 * bugsEaten;
             // water cleanliness, max of an additional 25%
-            survivalRate += 25 - 0.25 * (Pond.waterDirtiness);
+            survivalRate += 25 - 0.25 * (GameRunner.pond.getWaterDirtiness());
             // if the frog has a burrow it adds 30%
             if (hasBurrow) {
                 survivalRate += 30;
@@ -90,8 +90,7 @@ public class Frog {
         return randNum <= survivalRate;
     }
 
-    public void goToNextDay() {
-        boolean frogIsAlive = this.isAlive();
+    public void endDay(boolean frogIsAlive) {
 
         // if the tadpole lives
         if (frogIsAlive && stage == 0) {
@@ -113,13 +112,13 @@ public class Frog {
         // if the frog dies
         else {
             // declares the frog dead
-            stage = -1;
+            System.out.println(name + " died");
         }
     }
 
     // moves frog to the next stage
     public void grow() {
-        if (stage < 2) {
+        if (stage < 1) {
             stage++;
         }
         else {
@@ -139,7 +138,7 @@ public class Frog {
     }
 
     public void stopSwimming() {
-        // if the Frog is still a tadpole
+        // if the Frog (object) is still a tadpole
         if (stage == 0) {
             swimPos.startTadpoleSwimTimer();
         }

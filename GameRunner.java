@@ -11,8 +11,12 @@
 */
 
 public class GameRunner {
+
+    // stores the Pond object in a way that can be accessed from multiple classes
+    public static Pond pond;
+
     public static void main(String[] args) {
         // creates the window and starts the game
-        new Pond();
+        pond = new Pond();
     }
 }
