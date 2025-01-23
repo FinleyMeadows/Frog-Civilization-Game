@@ -540,7 +540,6 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             lilyPadSlot.setSize(lilyPadSlot.getPreferredSize());
             // evenly spaces out each lily pad slot across 700 pixels
             lilyPadSlot.setLocation(i * 29 + gap, 203 - lilyPadSlot.getHeight());
-            lilyPadSlot.addMouseListener(this);
             // invisible until planting a lily pad seed
             lilyPadSlot.setVisible(false);
             layeredPane.add(lilyPadSlot, Integer.valueOf(2));
@@ -980,9 +979,10 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         spendTime(1);
 
         JLabel lilyPad = new JLabel();
+        // sets the image to the floating seed
         lilyPad.setIcon(loadImage("Pictures/SeedDay1.png"));
         lilyPad.setSize(lilyPad.getPreferredSize());
-        System.out.println("Lily Pad Size: " + lilyPad.getPreferredSize());
+        // puts it into the location of the slot label
         lilyPad.setLocation((int) slotPos.getX(), 203 - lilyPad.getHeight() + 5);
         layeredPane.add(lilyPad, Integer.valueOf(2));
         lilyPads.put(lilyPad, 1);
@@ -1006,7 +1006,10 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
                 else {
                     lilyPad.setIcon(loadImage("Pictures/LilyPad.png"));
                 }
-                lilyPad.setLocation(lilyPad.getX(), lilyPad.getY() - 4);
+
+                // updates the size and location of the lily pad so it rests slightly in the water
+                lilyPad.setSize(lilyPad.getPreferredSize());
+                lilyPad.setLocation(lilyPad.getX(), 203 - lilyPad.getHeight() + 1);
 
                 // updates the map
                 lilyPads.put(lilyPad, lilyPads.get(lilyPad) + 1);
@@ -1276,6 +1279,7 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
                 // if clicking the next day
                 if (name.equals("NextDayButton")) {
                     // TODO: go to next day
+                    growLilyPads();
                 }
                 // if clicking the condense label
                 else if (name.equals("CondenseToggle")) {
