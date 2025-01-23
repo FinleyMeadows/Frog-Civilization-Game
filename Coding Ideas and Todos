@@ -90,7 +90,6 @@ and empty. Once the burrow is decorated and furnished, 5 frogs can inhabit the b
    - Calculates eggs hatching
    - Calculates tadpoles growing and survival
    - Calculates the amount of food eaten
-   - Calculates how many bugs flew away
    - Calculates the number of eggs laid
    - Create a "new day" screen that displays the current day and the all of the resource changes that happened overnight.
 10. Make Custom Buttons
