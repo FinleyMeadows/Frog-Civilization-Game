@@ -60,7 +60,7 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
 
     // background components
     private JLabel sky = new JLabel(loadImage("Pictures/Sky.png"));
-    private JLabel water = new JLabel(loadImage("Pictures/Water.png"));
+    private JLabel water = new JLabel(loadImage("Pictures/WaterLevels/Water.png"));
     private JLabel ground = new JLabel(loadImage("Pictures/Ground.png"));
     private JLabel rockBed;
 
@@ -163,6 +163,10 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
 
         // adds all the empty burrow in the ground
         addBurrows();
+
+        // TODO: remove once done with testing
+        // spawns in a couple tadpoles to test their swimming
+        spawnTadpoles(4);
     }
 
     // - - - I T E M  M A N A G E M E N T - - - //
@@ -1029,12 +1033,17 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             return 0;
         }
         else {
+            // creates the Frog object
             Frog swimmingFrog = new Frog();
             // immediately grows the frog into stage 3: "Frog"
             swimmingFrog.grow();
+            // edits the display label from that Frog object
             JLabel frogLabel = swimmingFrog.getDisplayLabel();
+            // adds a MouseListener so the frog's name can be displayed when hovered over
             frogLabel.addMouseListener(this);
+            // adds the frog to the frog map
             frogs.put(frogLabel, swimmingFrog);
+            // makes the frog start swimming
             swimmingFrog.startSwimming();
 
             // adds it to the screen between layers 1-4
@@ -1049,7 +1058,19 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
             return 0;
         }
         else {
+            // creates the Frog object
+            Frog tadpole = new Frog();
+            // edits the display label from that Frog object
+            JLabel tadpoleLabel = tadpole.getDisplayLabel();
+            // adds a MouseListener so the frog's name can be displayed when hovered over
+            tadpoleLabel.addMouseListener(this);
+            // adds the tadpole to the tadpole map
+            tadpoles.put(tadpoleLabel, tadpole);
+            // makes the tadpole start swimming
+            tadpole.startSwimming();
 
+            // adds it to the screen between layers 1-4
+            layeredPane.add(tadpoleLabel, Integer.valueOf((int) (Math.random() * 4) + 1));
 
             return spawnTadpoles(n - 1);
         }
@@ -1076,7 +1097,7 @@ public class Pond extends JFrame implements MouseListener, MouseMotionListener {
         namePosUpdater.start();
     }
 
-    public boolean enoughTime(int additiveHours) {
+    public boolean thereIsEnoughTime(int additiveHours) {
         return true; // TODO: figure this shit out, I'm too tired rn
     }
 
