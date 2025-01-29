@@ -6,7 +6,7 @@
 
 import javax.swing.*;
 
-public class SwimMovementHandler {
+public class SwimHandler {
 
     private final Frog frog;
     private int xPos;
@@ -25,10 +25,13 @@ public class SwimMovementHandler {
     // start on frame 2 / 4 because the timer starts with a 250 milli delay (1 frame)
     private int frame = 2;
 
-    public SwimMovementHandler(Frog frog) {
+    public SwimHandler(Frog frog) {
         this.frog = frog;
-        this.xPos = frog.getXPos();
-        this.yPos = frog.getYPos();
+    }
+
+    public void updateFrogPos(Frog frog) {
+        xPos = frog.getXPos();
+        yPos = frog.getYPos();
 
         // 50-50 swimming up or down, (+) vs (-) y-movement direction
         if (((int) (Math.random() * 2)) == 1) {
@@ -395,6 +398,8 @@ public class SwimMovementHandler {
     }
 
     public void startFrogSwimTimer() {
+        // updates the frogs position within this class
+        updateFrogPos(frog);
         // sets the x and y velocities for the frog
         initializeFrogValues();
         // creates a timer to control the frogs movement
@@ -408,6 +413,8 @@ public class SwimMovementHandler {
     }
 
     public void startTadpoleSwimTimer() {
+        // updates the frogs position within this class
+        updateFrogPos(frog);
         // sets the x and y velocities for the tadpole
         initializeTadPoleValues();
         // creates a timer to control the tadpole's movement

@@ -20,10 +20,16 @@ public class Frog {
     private int bugsEaten;
     // each frog needs a burrow
     private boolean hasBurrow;
+    // each frog needs a lily pad to eat
+    private boolean hasLilyPad;
+    // saves the burrow the frog is assigned to
+    private FrogContainer burrow;
+    // saves the lily pad the frog is assigned to
+    private FrogContainer lilyPad;
     // display label for the egg, tadpole, or frog
     private JLabel displayLabel = new JLabel();
     // swims the frog/tadpole around when in the water
-    private SwimMovementHandler swimPos;
+    private SwimHandler swimPos;
 
     public Frog() {
         // starts as a tadpole (stage 0)
@@ -35,9 +41,9 @@ public class Frog {
         this.hasBurrow = false;
         displayLabel.setName("FrogLabel");
         // puts the tadpole somewhere random in the water
-        randomizeWaterCoords();
+        randomizeWaterLoc();
         // assigns a SwimMovementHandler to the tadpole so it can be swum around
-        swimPos = new SwimMovementHandler(this);
+        swimPos = new SwimHandler(this);
     }
 
     private String getRandomName() {
@@ -49,15 +55,16 @@ public class Frog {
                 "Hoppy", "Bouncer", "Ribbit", "Wiggles", "Toadette",
                 "Leapster", "Zippy", "Quibbles", "Splashy", "Flip-Flop",
                 "Frodo", "Glimmer", "Toadsworth", "Finley", "Froglina",
-                "Mikey", "Skippy", "Doodle", "Liam", "Luca", "Michael"
+                "Mikey", "Skippy", "Doodle", "Liam", "Luca", "Michael",
         };
+
 
         return names[(int) (Math.random() * names.length)];
     }
 
-    private void randomizeWaterCoords() {
-        int x = (int) (Math.random() * (Pond.FRAME_WIDTH - displayLabel.getWidth()));
-        int y = (int) (Math.random() * (307 - displayLabel.getHeight())) + 203;
+    public void randomizeWaterLoc() {
+        int x = (int) (Math.random() * 600) + 50;
+        int y = (int) (Math.random() * 200) + 250;
         displayLabel.setLocation(x, y);
     }
 
@@ -71,6 +78,8 @@ public class Frog {
             survivalRate += 10 * algaeEaten;
             // based on water cleanliness
             survivalRate += 50 - GameRunner.pond.getWaterDirtiness() / 2.0;
+
+            System.out.println("Tadpole survival rate: " + survivalRate);
         }
         // frog
         else {
@@ -84,35 +93,36 @@ public class Frog {
             if (hasBurrow) {
                 survivalRate += 30;
             }
+
+            System.out.println("Frog survival rate: " + survivalRate);
         }
+
+        System.out.print(randNum + " <= " + survivalRate + " = ");
+        System.out.println(randNum <= survivalRate);
 
         // if the random number is within the survival rate it returns true
         return randNum <= survivalRate;
     }
 
-    public void endDay(boolean frogIsAlive) {
+    // this method is only run on living Frog objects
+    public void endDay() {
 
-        // if the tadpole lives
-        if (frogIsAlive && stage == 0) {
+        // if the tadpole reaches the end of the day
+        if (stage == 0) {
             // reset the food eaten throughout the day
             algaeEaten = 0;
 
-            // 50-50 for the tadpole to grow
-            if ((int) (Math.random() * 2) == 1) {
+            // 75% chance for the tadpole to grow
+            if ((int) (Math.random() * 4) + 1 < 4) {
                 this.grow();
-                stage = 1;
+                System.out.println(name + " grew!");
             }
         }
-        // if the frog lives
-        else if (frogIsAlive && stage == 1) {
+        // if the frog reaches the end of the day
+        else {
             // reset the food eaten throughout the day
             bugsEaten = 0;
 
-        }
-        // if the frog dies
-        else {
-            // declares the frog dead
-            System.out.println(name + " died");
         }
     }
 
@@ -140,12 +150,11 @@ public class Frog {
     public void stopSwimming() {
         // if the Frog (object) is still a tadpole
         if (stage == 0) {
-            swimPos.startTadpoleSwimTimer();
+            swimPos.stopTadpoleSwimTimer();
         }
         // if the Frog is in stage 1, a frog
         else {
-            displayLabel.setIcon(new ImageIcon("Animations/IdleFrog.gif"));
-            swimPos.startFrogSwimTimer();
+            swimPos.stopFrogSwimTimer();
         }
 
     }
@@ -182,7 +191,33 @@ public class Frog {
         return hasBurrow;
     }
 
-    public void setHasBurrow(boolean hasBurrow) {
-        this.hasBurrow = hasBurrow;
+    public boolean hasLilyPad() {
+        return hasLilyPad;
+    }
+
+    public void feedBugs(int bugs) {
+        bugsEaten += bugs;
+    }
+
+    public void feedPlants(int plants) {
+        algaeEaten += plants;
+    }
+
+    public void setBurrow(FrogContainer burrow) {
+        hasBurrow = true;
+        this.burrow = burrow;
+    }
+
+    public FrogContainer getBurrow() {
+        return burrow;
+    }
+
+    public void setLilyPad(FrogContainer lilyPad) {
+        hasLilyPad = true;
+        this.lilyPad = lilyPad;
+    }
+
+    public FrogContainer getLilyPad() {
+        return lilyPad;
     }
 }
